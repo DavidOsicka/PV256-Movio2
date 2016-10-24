@@ -9,17 +9,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by david on 10.10.16.
  */
 
 public class ListViewFragment extends Fragment {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView mRecyclerView = null;
+    private RecyclerView.Adapter mAdapter = null;
+    private RecyclerView.LayoutManager mLayoutManager = null;
 
-    //private Context appContext;
+    private WeakReference<Context> mContextWeakReference;
+
     private String[] dataset = {"movie 1", "movie 2", "movie 3"};
 
 
@@ -31,23 +34,27 @@ public class ListViewFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        // use this setting to improve performance if you know that changes in content do not change the layout size of the RecyclerView
+        if(mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        //mLayoutManager = new LinearLayoutManager(appContext);     not sure if needed
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+            // use a linear layout manager
+            mLayoutManager = new LinearLayoutManager(getContext());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+        }
 
         // specify an adapter (see also next example)
-        mAdapter = new RecyclerViewAdapter(dataset);
-        mRecyclerView.setAdapter(mAdapter);
+        if(mContextWeakReference != null) {
+            mAdapter = new RecyclerViewAdapter(dataset, mContextWeakReference.get());
+            mRecyclerView.setAdapter(mAdapter);
+        }
 
         return view;
     }
 
-    //public void setAppContext(Context context) {
-    //    appContext = context;
-    //}
+    public void setAppContext(Context context) {
+        if(context != null) {
+            mContextWeakReference = new WeakReference<Context>(context);
+        }
+    }
 }

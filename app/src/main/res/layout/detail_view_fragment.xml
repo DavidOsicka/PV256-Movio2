@@ -11,33 +11,37 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!--cover picture-->
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="150dp"
             app:srcCompat="@android:color/transparent"
             android:id="@+id/imageView1"/>
 
-        <EditText
+        <!--Headline-->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:inputType="textMultiLine"
             android:ems="10"
             android:background="#95a2e7"
-            android:id="@+id/editText1"
+            android:id="@+id/movieTitle"
             android:layout_below="@+id/imageView1"
             android:layout_alignParentStart="true"/>
 
-        <EditText
+        <!--text description-->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/editText2"
+            android:id="@+id/movieDescription"
             android:layout_below="@+id/editText1"
             android:layout_alignParentStart="true"/>
 
     </LinearLayout>
 
+    <!--detail picture-->
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="100dp"
@@ -57,14 +61,14 @@
         app:layout_anchor="@id/imageView1"
         app:layout_anchorGravity="bottom|right|end"/>
 
-    <Button
+<!--    <Button
         android:text="Back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button_back"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="changeTheme"
+        android:onClick="backToList"
         />
-
+-->
 </android.support.design.widget.CoordinatorLayout>
