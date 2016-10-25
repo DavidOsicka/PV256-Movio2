@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // The activity is being created.
+        Log.d("MainActivity", " onCreate method");
 
         // This starts a class with strict mode
         App app = new App();
@@ -76,27 +78,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // The activity is about to become visible.
-
+        Log.d("MainActivity", " onStart method");
     }
     @Override
     protected void onResume() {
         super.onResume();
         // The activity has become visible (it is now "resumed").
+        Log.d("MainActivity", " onResume method");
     }
     @Override
     protected void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
+        Log.d("MainActivity", " onPause method");
     }
     @Override
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
+        Log.d("MainActivity", " onStop method");
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // The activity is about to be destroyed.
+        Log.d("MainActivity", " onDestroy method");
     }
 
 
