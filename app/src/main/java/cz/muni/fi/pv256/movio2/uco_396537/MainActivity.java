@@ -15,6 +15,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getName();
+
+    //public static final String ARG_MOVIE_ID = "movie_id";
+    public static final String ARG_SHOW_DETAIL = "show_detail";
+
     private static final String PREFERENCES_NAME = "pref";
     private static final String THEME_NAME = "theme";
 
@@ -23,20 +28,17 @@ public class MainActivity extends AppCompatActivity {
     private boolean isTablet = false;
     private ArrayList<Movie> mMovies = new ArrayList<Movie>();
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // The activity is being created.
-        Log.d("MainActivity", " onCreate method");
+        Log.d(TAG, " onCreate method");
 
         // This starts a class with strict mode
-        App app = new App();
-        app.onCreate();
-
-        // If we're being restored from a previous state, then we don't need to do anything and should return or else we could end up with overlapping fragments.
-        if (savedInstanceState != null) {
-            return;
-        }
+        //App app = new App();
+        //app.onCreate();
 
         // This is used to reload theme from preferences when swithing themes
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
@@ -45,10 +47,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setTheme(R.style.AppTheme2);
         }
-
-        ListViewFragment listViewFragment = new ListViewFragment();
-        DetailViewFragment detailViewFragment = new DetailViewFragment();
-        listViewFragment.setAppContext(this);
 
         isTablet = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
@@ -65,46 +63,74 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
         }
 
+        ListViewFragment listViewFragment = new ListViewFragment();
+        DetailViewFragment detailViewFragment = new DetailViewFragment();
+        listViewFragment.setAppContext(this);
+
+        // we're being restored from a previous state
+        if (savedInstanceState != null) {
+//            if(isTablet) {
+//
+//            } else {
+//                boolean showDetail = savedInstanceState.getBoolean(ARG_SHOW_DETAIL, false);
+//                if(showDetail) {
+//                    detailViewFragment.setArguments(savedInstanceState);
+//                    fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
+//                } else {
+//                    fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
+//                }
+//            }
+            return;
+        }
+
         if(findViewById(R.id.main_fragment_container) != null) {
             fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
         }
         if(findViewById(R.id.detail_fragment_container) != null) {
             fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
         }
-
     }
+
+//    @Override
+//    protected void onSaveInstanceState (Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//
+//        if(fragmentManager.findFragmentById(R.id.detail_view_fragment) != null) {
+//            outState.putBoolean(ARG_SHOW_DETAIL, true);
+//        }
+//    }
 
     @Override
     protected void onStart() {
         super.onStart();
         // The activity is about to become visible.
-        Log.d("MainActivity", " onStart method");
+        Log.d(TAG, " onStart method");
     }
     @Override
     protected void onResume() {
         super.onResume();
         // The activity has become visible (it is now "resumed").
-        Log.d("MainActivity", " onResume method");
+        Log.d(TAG, " onResume method");
     }
     @Override
     protected void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
-        Log.d("MainActivity", " onPause method");
+        Log.d(TAG, " onPause method");
+        //onSaveInstanceState(new Bundle());
     }
     @Override
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
-        Log.d("MainActivity", " onStop method");
+        Log.d(TAG, " onStop method");
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // The activity is about to be destroyed.
-        Log.d("MainActivity", " onDestroy method");
+        Log.d(TAG, " onDestroy method");
     }
-
 
     public void onMovieItemSelected(int item) {
         if(item < 0 || item > mMovies.size()) {
@@ -113,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DetailViewFragment.class);
         intent.putExtra("Movie", mMovies.get(item));
         Bundle bundle = intent.getExtras();
+        bundle.putBoolean(ARG_SHOW_DETAIL, true);
+        //bundle.putInt(ARG_MOVIE_ID, item);
 
         DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
         FragmentTransaction transition = fragmentManager.beginTransaction();
