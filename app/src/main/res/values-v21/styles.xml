@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppThemes2" parent="AppTheme1">
+    <style name="AppTheme2" parent="AppTheme1">
         <item name="colorPrimary">@color/primary_material_dark_1</item>
         <item name="android:navigationBarColor">@android:color/holo_green_dark</item>
         <item name="android:textColorPrimary">@color/primary_text_material_light</item>
