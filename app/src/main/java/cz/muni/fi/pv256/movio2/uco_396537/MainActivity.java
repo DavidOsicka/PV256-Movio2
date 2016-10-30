@@ -99,38 +99,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // The activity is about to become visible.
-        Log.d(TAG, " onStart method");
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // The activity has become visible (it is now "resumed").
-        Log.d(TAG, " onResume method");
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Another activity is taking focus (this activity is about to be "paused").
-        Log.d(TAG, " onPause method");
-        //onSaveInstanceState(new Bundle());
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // The activity is no longer visible (it is now "stopped")
-        Log.d(TAG, " onStop method");
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // The activity is about to be destroyed.
-        Log.d(TAG, " onDestroy method");
-    }
-
     public void onMovieItemSelected(int item) {
         if(item < 0 || item >= Model.ITEMS.size()) {
             return;
@@ -184,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void changeTheme(View view) {
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
         SharedPreferences.Editor editor = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit();
@@ -201,5 +168,37 @@ public class MainActivity extends AppCompatActivity {
         finish();
 
         startActivity(intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // The activity is about to become visible.
+        Log.d(TAG, " onStart method");
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // The activity has become visible (it is now "resumed").
+        Log.d(TAG, " onResume method");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Another activity is taking focus (this activity is about to be "paused").
+        Log.d(TAG, " onPause method");
+        //onSaveInstanceState(new Bundle());
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // The activity is no longer visible (it is now "stopped")
+        Log.d(TAG, " onStop method");
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // The activity is about to be destroyed.
+        Log.d(TAG, " onDestroy method");
     }
 }

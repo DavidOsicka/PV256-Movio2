@@ -30,12 +30,14 @@ public class DetailViewFragment extends Fragment {
     private Drawable coverPicture = null;
     private Drawable backdropPicture = null;
 
-    private WeakReference<Context> mContextWeakReference = null;
+    //private WeakReference<Context> mContextWeakReference = null;
+    Context mContext = null;
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = getActivity();
         Log.d(TAG, " onAttach method");
     }
 
@@ -49,10 +51,14 @@ public class DetailViewFragment extends Fragment {
             if(movie != null) {
                 movieTitle = movie.getTitle() + "/n" + String.valueOf(movie.getReleaseDate());
                 if(!movie.getCoverPath().isEmpty()) {
-                    coverPicture = getContext().getDrawable(Integer.parseInt(movie.getCoverPath()));
+                    Context c = getActivity();
+                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getCoverPath()));
+                    //coverPicture = getActivity().getDrawable(Integer.parseInt(movie.getCoverPath()));
                 }
                 if(!movie.getBackdrop().isEmpty()) {
-                    backdropPicture = getContext().getDrawable(Integer.parseInt(movie.getBackdrop()));
+                    Context c = getActivity();
+                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getBackdrop()));
+                    //backdropPicture = getActivity().getDrawable(Integer.parseInt(movie.getBackdrop()));
                 }
             }
         }
@@ -97,12 +103,16 @@ public class DetailViewFragment extends Fragment {
         if(args != null) {
             Movie movie = args.getParcelable("Movie");
             if(movie != null) {
-                movieTitle = movie.getTitle() + "/n" + String.valueOf(movie.getReleaseDate());
-                if(!movie.getCoverPath().isEmpty() && mContextWeakReference != null) {
-                    coverPicture = mContextWeakReference.get().getDrawable(Integer.parseInt(movie.getCoverPath()));
+                movieTitle = movie.getTitle() + "\\n" + String.valueOf(movie.getReleaseDate());
+                if(!movie.getCoverPath().isEmpty()) {
+                    Context c = getActivity();
+                        coverPicture = mContext.getDrawable(Integer.parseInt(movie.getCoverPath()));
+                    //coverPicture = getActivity().getDrawable(Integer.parseInt(movie.getCoverPath()));
                 }
-                if(!movie.getBackdrop().isEmpty() && mContextWeakReference != null) {
-                    backdropPicture = mContextWeakReference.get().getDrawable(Integer.parseInt(movie.getBackdrop()));
+                if(!movie.getBackdrop().isEmpty()) {
+                    Context c = getActivity();
+                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getBackdrop()));
+                    //backdropPicture = getActivity().getDrawable(Integer.parseInt(movie.getBackdrop()));
                 }
             }
         }
@@ -116,7 +126,7 @@ public class DetailViewFragment extends Fragment {
 
     public void setAppContext(Context context) {
         if(context != null) {
-            mContextWeakReference = new WeakReference<Context>(context);
+            //mContextWeakReference = new WeakReference<Context>(context);
         }
     }
 
