@@ -1,13 +1,20 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.lang.ref.WeakReference;
+
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
  * Created by david on 10.10.16.
@@ -18,8 +25,12 @@ public class DetailViewFragment extends Fragment {
     private static final String TAG = DetailViewFragment.class.getName();
     private static final String ARG_TITLE = "title";
 
-    private String movieTitle = "Movie title";
+    private String movieTitle = "";
+    private String movieDescription = "";
+    private Drawable coverPicture = null;
+    private Drawable backdropPicture = null;
 
+    private WeakReference<Context> mContextWeakReference = null;
 
 
     @Override
@@ -36,9 +47,13 @@ public class DetailViewFragment extends Fragment {
         if(savedInstanceState != null) {
             Movie movie = savedInstanceState.getParcelable("Movie");
             if(movie != null) {
-                movieTitle = movie.getTitle();
-            } else {
-                movieTitle = savedInstanceState.getString(  ARG_TITLE);
+                movieTitle = movie.getTitle() + "/n" + String.valueOf(movie.getReleaseDate());
+                if(!movie.getCoverPath().isEmpty()) {
+                    coverPicture = getContext().getDrawable(Integer.parseInt(movie.getCoverPath()));
+                }
+                if(!movie.getBackdrop().isEmpty()) {
+                    backdropPicture = getContext().getDrawable(Integer.parseInt(movie.getBackdrop()));
+                }
             }
         }
     }
@@ -49,10 +64,23 @@ public class DetailViewFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.detail_view_fragment, container, false);
-        TextView titleView = (TextView)view.findViewById(R.id.movieTitle);
+
+        TextView titleView = (TextView)view.findViewById(R.id.movie_title_year);
+        TextView descriptionView = (TextView)view.findViewById(R.id.movie_description);
+        ImageView coverView = (ImageView)view.findViewById(R.id.cover_image);
+        ImageView backdropView = (ImageView)view.findViewById(R.id.image_backdrop);
 
         if(titleView != null) {
             titleView.setText(movieTitle);
+        }
+        if(descriptionView != null) {
+            descriptionView.setText(movieDescription);
+        }
+        if(coverView != null && coverPicture != null) {
+            coverView.setImageDrawable(coverPicture);
+        }
+        if(backdropView != null && backdropPicture != null) {
+            backdropView.setImageDrawable(backdropPicture);
         }
         return view;
     }
@@ -68,7 +96,15 @@ public class DetailViewFragment extends Fragment {
         //super.setArguments(args);
         if(args != null) {
             Movie movie = args.getParcelable("Movie");
-            movieTitle = movie.getTitle();
+            if(movie != null) {
+                movieTitle = movie.getTitle() + "/n" + String.valueOf(movie.getReleaseDate());
+                if(!movie.getCoverPath().isEmpty() && mContextWeakReference != null) {
+                    coverPicture = mContextWeakReference.get().getDrawable(Integer.parseInt(movie.getCoverPath()));
+                }
+                if(!movie.getBackdrop().isEmpty() && mContextWeakReference != null) {
+                    backdropPicture = mContextWeakReference.get().getDrawable(Integer.parseInt(movie.getBackdrop()));
+                }
+            }
         }
     }
 
@@ -76,6 +112,12 @@ public class DetailViewFragment extends Fragment {
     public void onSaveInstanceState (Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_TITLE, movieTitle);
+    }
+
+    public void setAppContext(Context context) {
+        if(context != null) {
+            mContextWeakReference = new WeakReference<Context>(context);
+        }
     }
 
     @Override

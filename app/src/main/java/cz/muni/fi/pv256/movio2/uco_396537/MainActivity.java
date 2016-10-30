@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import java.util.ArrayList;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private final FragmentManager fragmentManager = getSupportFragmentManager();
 
     private boolean isTablet = false;
-    private ArrayList<Movie> mMovies = new ArrayList<Movie>();
 
 
 
@@ -37,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onCreate method");
 
         // This starts a class with strict mode
-        //App app = new App();
-        //app.onCreate();
+        App app = new App();
+        app.onCreate();
 
         // This is used to reload theme from preferences when swithing themes
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
@@ -51,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
         isTablet = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
 
-        mMovies.add(new Movie("Film 1", 1991, "", "", 0.0f));
-        mMovies.add(new Movie("Film 2", 1992, "", "", 0.0f));
-        mMovies.add(new Movie("Film 3", 1993, "", "", 0.0f));
 
         if(isTablet) {
             //code for big screen (like tablet)
@@ -64,8 +62,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ListViewFragment listViewFragment = new ListViewFragment();
-        DetailViewFragment detailViewFragment = new DetailViewFragment();
         listViewFragment.setAppContext(this);
+        DetailViewFragment detailViewFragment = new DetailViewFragment();
+        detailViewFragment.setAppContext(this);
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
@@ -133,16 +132,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMovieItemSelected(int item) {
-        if(item < 0 || item > mMovies.size()) {
+        if(item < 0 || item >= Model.ITEMS.size()) {
             return;
         }
         Intent intent = new Intent(this, DetailViewFragment.class);
-        intent.putExtra("Movie", mMovies.get(item));
-        Bundle bundle = intent.getExtras();
+        Bundle bundle = new Bundle();
+        if(Model.ITEMS.get(item) instanceof Movie) {
+            intent.putExtra("Movie", (Movie) Model.ITEMS.get(item));
+            bundle = intent.getExtras();
+        }
         bundle.putBoolean(ARG_SHOW_DETAIL, true);
         //bundle.putInt(ARG_MOVIE_ID, item);
 
         DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
+        detailViewFragment.setAppContext(this);
         FragmentTransaction transition = fragmentManager.beginTransaction();
 
         if(isTablet) {
@@ -160,6 +163,14 @@ public class MainActivity extends AppCompatActivity {
         transition.commit();
     }
 
+    public void onMovieLongClick(int item) {
+        if(item < 0 || item >= Model.ITEMS.size()) {
+            return;
+        }
+        if(Model.ITEMS.get(item) instanceof Movie) {
+            Toast.makeText(this, ((Movie)((Movie) Model.ITEMS.get(item))).getTitle(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public void backToList(View view) {
         if(isTablet) {

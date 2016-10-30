@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 
 import java.lang.ref.WeakReference;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+
 /**
  * Created by david on 10.10.16.
  */
@@ -24,7 +26,7 @@ public class ListViewFragment extends Fragment {
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
 
-    private WeakReference<Context> mContextWeakReference;
+    private WeakReference<Context> mContextWeakReference = null;
 
     private String[] dataset = {"movie 1", "movie 2", "movie 3"};
 
@@ -50,20 +52,23 @@ public class ListViewFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
-        // use this setting to improve performance if you know that changes in content do not change the layout size of the RecyclerView
         if(mRecyclerView != null) {
+            // this setting improves performance if you know that changes in content do not change the layout size of the RecyclerView
             mRecyclerView.setHasFixedSize(true);
-
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
         }
 
-        // specify an adapter (see also next example)
-        if(mContextWeakReference != null) {
-            mAdapter = new RecyclerViewAdapter(dataset, mContextWeakReference.get());
+        if(Model.ITEMS.isEmpty()) {
+            mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+            mRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter = new RecyclerViewAdapter(Model.ITEMS, mContextWeakReference.get());
             mRecyclerView.setAdapter(mAdapter);
         }
+
+
 
         return view;
     }
