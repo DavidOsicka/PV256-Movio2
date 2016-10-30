@@ -15,11 +15,12 @@ public class Model {
     static {
 
         ITEMS.add(new String("HOROR"));
-        ITEMS.add(new Movie("Film 1", 1991, String.valueOf(R.drawable.walking_dead_cover), String.valueOf(R.drawable.walking_dead_backdrop), 0.0f));
-        ITEMS.add(new String("COMEDY"));
-        ITEMS.add(new Movie("Film 2", 1992, "", "", 1.0f));
-        ITEMS.add(new String("HISTORICAL"));
-        ITEMS.add(new Movie("Film 3", 1993, "", "", 2.0f));
+        ITEMS.add(new Movie("Walking dead", 2010, String.valueOf(R.drawable.walking_dead_cover), String.valueOf(R.drawable.walking_dead_backdrop), 0.0f));
+        ITEMS.add(new String("ROMANTIC"));
+        ITEMS.add(new Movie("The Vampire Diaries", 2009, String.valueOf(R.drawable.vampire_diaries_cover), String.valueOf(R.drawable.vampire_diaries_backdrop), 1.0f));
+        ITEMS.add(new String("ACTION"));
+        ITEMS.add(new Movie("Inferno", 2016, String.valueOf(R.drawable.inferno_cover), String.valueOf(R.drawable.inferno_backdrop), 2.0f));
         ITEMS.add(new String("FANTASY & SCI-FI"));
+        ITEMS.add(new Movie("No name movie with no data", 1993, "", "", 2.0f));
     }
 }

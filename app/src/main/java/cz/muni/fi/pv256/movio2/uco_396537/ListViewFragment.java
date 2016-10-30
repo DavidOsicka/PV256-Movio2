@@ -26,15 +26,13 @@ public class ListViewFragment extends Fragment {
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
 
-    private WeakReference<Context> mContextWeakReference = null;
-
-    private String[] dataset = {"movie 1", "movie 2", "movie 3"};
-
+    private Context mContext = null;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, " onAttach  method");
+        mContext = getActivity();
     }
 
     @Override
@@ -64,19 +62,11 @@ public class ListViewFragment extends Fragment {
             mAdapter = new RecyclerViewAdapter("Sorry, no data available");
             mRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter = new RecyclerViewAdapter(Model.ITEMS, mContextWeakReference.get());
+            mAdapter = new RecyclerViewAdapter(Model.ITEMS, mContext);
             mRecyclerView.setAdapter(mAdapter);
         }
 
-
-
         return view;
-    }
-
-    public void setAppContext(Context context) {
-        if(context != null) {
-            mContextWeakReference = new WeakReference<Context>(context);
-        }
     }
 
     @Override

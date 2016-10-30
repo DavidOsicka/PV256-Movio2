@@ -1,8 +1,6 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.lang.ref.WeakReference;
 
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
@@ -23,22 +19,31 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 public class DetailViewFragment extends Fragment {
 
     private static final String TAG = DetailViewFragment.class.getName();
-    private static final String ARG_TITLE = "title";
+    private static final String ARG_TITLE_YEAR = "title_year";
+    private static final String ARG_DESCRIPTION = "description";
+    private static final String ARG_COVER = "cover";
+    private static final String ARG_BACKDROP = "backdrop";
 
-    private String movieTitle = "";
-    private String movieDescription = "";
-    private Drawable coverPicture = null;
-    private Drawable backdropPicture = null;
+    private String movieTitleYear = "";
+    private String movieDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    private String coverPicture = "";
+    private String backdropPicture = "";
 
-    //private WeakReference<Context> mContextWeakReference = null;
     Context mContext = null;
 
+
+
+    public static DetailViewFragment newInstance(Bundle args){
+        DetailViewFragment fragment = new DetailViewFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = getActivity();
         Log.d(TAG, " onAttach method");
+        mContext = getActivity();
     }
 
     @Override
@@ -47,20 +52,10 @@ public class DetailViewFragment extends Fragment {
         Log.d(TAG, " onCreate method");
 
         if(savedInstanceState != null) {
-            Movie movie = savedInstanceState.getParcelable("Movie");
-            if(movie != null) {
-                movieTitle = movie.getTitle() + "/n" + String.valueOf(movie.getReleaseDate());
-                if(!movie.getCoverPath().isEmpty()) {
-                    Context c = getActivity();
-                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getCoverPath()));
-                    //coverPicture = getActivity().getDrawable(Integer.parseInt(movie.getCoverPath()));
-                }
-                if(!movie.getBackdrop().isEmpty()) {
-                    Context c = getActivity();
-                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getBackdrop()));
-                    //backdropPicture = getActivity().getDrawable(Integer.parseInt(movie.getBackdrop()));
-                }
-            }
+            movieTitleYear = savedInstanceState.getString(ARG_TITLE_YEAR);
+            movieDescription = savedInstanceState.getString(ARG_DESCRIPTION);
+            coverPicture = savedInstanceState.getString(ARG_COVER);
+            backdropPicture = savedInstanceState.getString(ARG_BACKDROP);
         }
     }
 
@@ -73,61 +68,42 @@ public class DetailViewFragment extends Fragment {
 
         TextView titleView = (TextView)view.findViewById(R.id.movie_title_year);
         TextView descriptionView = (TextView)view.findViewById(R.id.movie_description);
-        ImageView coverView = (ImageView)view.findViewById(R.id.cover_image);
+        ImageView coverView = (ImageView)view.findViewById(R.id.image_cover);
         ImageView backdropView = (ImageView)view.findViewById(R.id.image_backdrop);
 
         if(titleView != null) {
-            titleView.setText(movieTitle);
+            titleView.setText(movieTitleYear);
         }
         if(descriptionView != null) {
             descriptionView.setText(movieDescription);
         }
-        if(coverView != null && coverPicture != null) {
-            coverView.setImageDrawable(coverPicture);
+        if(coverView != null && mContext != null && !coverPicture.isEmpty()) {
+            coverView.setImageDrawable(mContext.getDrawable(Integer.parseInt(coverPicture)));
         }
-        if(backdropView != null && backdropPicture != null) {
-            backdropView.setImageDrawable(backdropPicture);
+        if(backdropView != null && mContext != null && !backdropPicture.isEmpty()) {
+            backdropView.setImageDrawable(mContext.getDrawable(Integer.parseInt(backdropPicture)));
         }
         return view;
-    }
-
-    public static DetailViewFragment newInstance(Bundle args){
-        DetailViewFragment fragment = new DetailViewFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void setArguments(Bundle args) {
         //super.setArguments(args);
-        if(args != null) {
+        if(args != null && args.containsKey("Movie")) {
             Movie movie = args.getParcelable("Movie");
-            if(movie != null) {
-                movieTitle = movie.getTitle() + "\\n" + String.valueOf(movie.getReleaseDate());
-                if(!movie.getCoverPath().isEmpty()) {
-                    Context c = getActivity();
-                        coverPicture = mContext.getDrawable(Integer.parseInt(movie.getCoverPath()));
-                    //coverPicture = getActivity().getDrawable(Integer.parseInt(movie.getCoverPath()));
-                }
-                if(!movie.getBackdrop().isEmpty()) {
-                    Context c = getActivity();
-                    coverPicture = mContext.getDrawable(Integer.parseInt(movie.getBackdrop()));
-                    //backdropPicture = getActivity().getDrawable(Integer.parseInt(movie.getBackdrop()));
-                }
-            }
+            movieTitleYear = movie.getTitle() + System.lineSeparator() + String.valueOf(movie.getReleaseDate());
+            coverPicture = movie.getCoverPath();
+            backdropPicture = movie.getBackdrop();
         }
     }
 
     @Override
     public void onSaveInstanceState (Bundle outState) {
+        outState.putString(ARG_TITLE_YEAR, movieTitleYear);
+        outState.putString(ARG_DESCRIPTION, movieDescription);
+        outState.putString(ARG_COVER, coverPicture);
+        outState.putString(ARG_BACKDROP, backdropPicture);
         super.onSaveInstanceState(outState);
-        outState.putString(ARG_TITLE, movieTitle);
-    }
-
-    public void setAppContext(Context context) {
-        if(context != null) {
-            //mContextWeakReference = new WeakReference<Context>(context);
-        }
     }
 
     @Override

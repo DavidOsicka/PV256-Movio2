@@ -12,23 +12,25 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--cover picture-->
+        <!--backdrop picture-->
         <ImageView
-            android:id="@+id/cover_image"
+            android:id="@+id/image_backdrop"
             android:layout_width="match_parent"
+            android:scaleType="centerCrop"
             android:layout_height="150dp"
             app:srcCompat="@android:color/transparent"/>
 
         <!--Headline-->
         <TextView
-
             android:id="@+id/movie_title_year"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:inputType="textMultiLine"
-            android:ems="10"
-            android:background="#95a2e7"
-            android:layout_below="@+id/cover_image"
+            android:paddingTop="10dp"
+            android:paddingLeft="150dp"
+            android:textSize="25dp"
+            android:background="@color/colorPrimary"
+            android:layout_below="@+id/image_backdrop"
             android:layout_alignParentStart="true"/>
 
         <!--text description-->
@@ -37,17 +39,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="textMultiLine"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:ems="10"
             android:layout_below="@+id/movie_title_year"
             android:layout_alignParentStart="true"/>
 
     </LinearLayout>
 
-    <!--detail picture-->
+    <!--cover picture-->
     <ImageView
-        android:id="@+id/image_backdrop"
-        android:layout_width="100dp"
-        android:layout_height="120dp"
+        android:id="@+id/image_cover"
+        android:layout_width="110dp"
+        android:layout_height="130dp"
+        android:adjustViewBounds="true"
         android:background="@android:color/transparent"
         android:layout_marginStart="37dp"
         android:layout_marginTop="100dp"
@@ -60,7 +67,8 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:src="@android:drawable/ic_input_add"
-        app:layout_anchor="@id/cover_image"
+        android:background="@color/primary_text_material_light"
+        app:layout_anchor="@id/image_backdrop"
         app:layout_anchorGravity="bottom|right|end"/>
 
 </android.support.design.widget.CoordinatorLayout>

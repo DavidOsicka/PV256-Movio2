@@ -18,10 +18,7 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
-
-    //public static final String ARG_MOVIE_ID = "movie_id";
-    public static final String ARG_SHOW_DETAIL = "show_detail";
-
+    private static final String ARG_SHOW_DETAIL = "show_detail";
     private static final String PREFERENCES_NAME = "pref";
     private static final String THEME_NAME = "theme";
 
@@ -62,23 +59,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ListViewFragment listViewFragment = new ListViewFragment();
-        listViewFragment.setAppContext(this);
         DetailViewFragment detailViewFragment = new DetailViewFragment();
-        detailViewFragment.setAppContext(this);
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
-//            if(isTablet) {
-//
-//            } else {
-//                boolean showDetail = savedInstanceState.getBoolean(ARG_SHOW_DETAIL, false);
-//                if(showDetail) {
-//                    detailViewFragment.setArguments(savedInstanceState);
-//                    fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
-//                } else {
-//                    fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
-//                }
-//            }
             return;
         }
 
@@ -90,14 +74,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onSaveInstanceState (Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//
-//        if(fragmentManager.findFragmentById(R.id.detail_view_fragment) != null) {
-//            outState.putBoolean(ARG_SHOW_DETAIL, true);
-//        }
-//    }
 
     public void onMovieItemSelected(int item) {
         if(item < 0 || item >= Model.ITEMS.size()) {
@@ -113,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
         //bundle.putInt(ARG_MOVIE_ID, item);
 
         DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
-        detailViewFragment.setAppContext(this);
         FragmentTransaction transition = fragmentManager.beginTransaction();
 
         if(isTablet) {
@@ -136,19 +111,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if(Model.ITEMS.get(item) instanceof Movie) {
-            Toast.makeText(this, ((Movie)((Movie) Model.ITEMS.get(item))).getTitle(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void backToList(View view) {
-        if(isTablet) {
-            //code for big screen (like tablet)
-        }else{
-            //code for small screen (like smartphone)
-            if(findViewById(R.id.main_fragment_container) != null) {
-                fragmentManager.popBackStack("detail_fragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                //fragmentManager.beginTransaction().replace(R.id.main_fragment_container, listViewFragment).commit();
-            }
+            Toast.makeText(this, ((Movie) Model.ITEMS.get(item)).getTitle(), Toast.LENGTH_SHORT).show();
         }
     }
 

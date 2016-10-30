@@ -29,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public static final int EMPTY_VIEW = 0, CATEGORY_VIEW = 1, MOVIE_VIEW = 2;
 
     private ArrayList<Object> mItems = new ArrayList<Object>();
-    private WeakReference<Context> mContextWeakReference = null;
+    private Context mContext = null;
     private boolean noData = false;
 
 
@@ -41,7 +41,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public RecyclerViewAdapter(ArrayList<Object> data, Context context) {
         mItems = data;
-        mContextWeakReference = new WeakReference<Context>(context);
+        mContext = context;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-// Create new views (invoked by the layout manager)
+    // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
@@ -75,7 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return new ViewHolder_category(view);
             case MOVIE_VIEW:
                 view = inflater.inflate(R.layout.movie_view, parent, false);
-                return new ViewHolder_movie(view, mContextWeakReference.get());
+                return new ViewHolder_movie(view, mContext);
             case EMPTY_VIEW :
                 view = inflater.inflate(R.layout.empty_view, parent, false);
                 return new ViewHolder_empty(view);
@@ -101,8 +101,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Movie movie = (Movie) mItems.get(position);
                 movieHolder.mMovieTitle.setText(movie.getTitle());
                 movieHolder.mMovieRating.setText(Float.toString(movie.getPopularity()));
-                if(!movie.getBackdrop().isEmpty()) {
-                    movieHolder.mMovieImage.setImageDrawable(mContextWeakReference.get().getDrawable(Integer.parseInt(movie.getBackdrop())));
+                if(!movie.getBackdrop().isEmpty() && mContext != null) {
+                    movieHolder.mMovieImage.setImageDrawable(mContext.getDrawable(Integer.parseInt(movie.getBackdrop())));
                 }
                 break;
             case EMPTY_VIEW :
@@ -111,9 +111,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
         }
     }
-
-
-
 
 
 
