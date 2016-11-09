@@ -15,6 +15,7 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
@@ -124,12 +125,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             editor.putString(THEME_NAME, "AppTheme1");
         }
-
         editor.apply();
-
         Intent intent = getIntent();
         finish();
-
         startActivity(intent);
     }
 
