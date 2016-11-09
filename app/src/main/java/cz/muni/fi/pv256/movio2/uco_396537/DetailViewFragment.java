@@ -43,7 +43,7 @@ public class DetailViewFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, " onAttach method");
-        mContext = getActivity();
+        mContext = getActivity().getApplicationContext();   // melo by to byt tak, jinak by ta aktivita nemohla byt ukoncena a leakovalo by to. Mel by se drzet kontext na celou aplikaci
     }
 
     @Override
