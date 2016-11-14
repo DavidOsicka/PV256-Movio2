@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onCreate method");
 
         // This starts a class with strict mode
-        //App app = new App();
-        //app.onCreate();
+        App app = new App();
+        app.onCreate();
 
         // This is used to reload theme from preferences when swithing themes
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
