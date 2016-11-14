@@ -7,4 +7,5 @@
     <color name="colorAccent">#c3e8f1</color>
     <color name="primary_material_dark_1">#035e38</color>
     <color name="primary_text_material_light">#def89203</color>
+	<color name="title">#000000</color>
 </resources>
