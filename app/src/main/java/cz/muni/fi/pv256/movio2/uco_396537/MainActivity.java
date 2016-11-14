@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
@@ -72,17 +75,20 @@ public class MainActivity extends AppCompatActivity {
         if(findViewById(R.id.detail_fragment_container) != null) {
             fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
         }
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
     }
 
 
-    public void onMovieItemSelected(int item) {
-        if(item < 0 || item >= Model.ITEMS.size()) {
+    public void onMovieClick(int item) {
+        if(item < 0 || item >= Model.getInstance().getMovies().size()) {
             return;
         }
         Intent intent = new Intent(this, DetailViewFragment.class);
         Bundle bundle = new Bundle();
-        if(Model.ITEMS.get(item) instanceof Movie) {
-            intent.putExtra("Movie", (Movie) Model.ITEMS.get(item));
+        if(Model.getInstance().getMovies().get(item) instanceof Movie) {
+            intent.putExtra("Movie", (Movie) Model.getInstance().getMovies().get(item));
             bundle = intent.getExtras();
         }
         bundle.putBoolean(ARG_SHOW_DETAIL, true);
@@ -107,11 +113,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMovieLongClick(int item) {
-        if(item < 0 || item >= Model.ITEMS.size()) {
+        if(item < 0 || item >= Model.getInstance().getMovies().size()) {
             return;
         }
-        if(Model.ITEMS.get(item) instanceof Movie) {
-            Toast.makeText(this, ((Movie) Model.ITEMS.get(item)).getTitle(), Toast.LENGTH_SHORT).show();
+        if(Model.getInstance().getMovies().get(item) instanceof Movie) {
+            Toast.makeText(this, ((Movie) Model.getInstance().getMovies().get(item)).getTitle(), Toast.LENGTH_SHORT).show();
         }
     }
 

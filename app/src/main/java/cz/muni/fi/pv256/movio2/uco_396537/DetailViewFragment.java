@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
@@ -29,7 +33,7 @@ public class DetailViewFragment extends Fragment {
     private String coverPicture = "";
     private String backdropPicture = "";
 
-    Context mContext = null;
+    private Context mContext = null;
 
 
 
@@ -78,10 +82,10 @@ public class DetailViewFragment extends Fragment {
             descriptionView.setText(movieDescription);
         }
         if(coverView != null && mContext != null && !coverPicture.isEmpty()) {
-            coverView.setImageDrawable(mContext.getDrawable(Integer.parseInt(coverPicture)));
+            coverView.setImageBitmap(Model.getInstance().getPicture(coverPicture));
         }
         if(backdropView != null && mContext != null && !backdropPicture.isEmpty()) {
-            backdropView.setImageDrawable(mContext.getDrawable(Integer.parseInt(backdropPicture)));
+            backdropView.setImageBitmap(Model.getInstance().getPicture(backdropPicture));
         }
         return view;
     }
@@ -91,7 +95,9 @@ public class DetailViewFragment extends Fragment {
         //super.setArguments(args);
         if(args != null && args.containsKey("Movie")) {
             Movie movie = args.getParcelable("Movie");
-            movieTitleYear = movie.getTitle() + System.lineSeparator() + String.valueOf(movie.getReleaseDate());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(movie.getReleaseDate());
+            movieTitleYear = movie.getTitle() + System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
             coverPicture = movie.getCoverPath();
             backdropPicture = movie.getBackdrop();
         }

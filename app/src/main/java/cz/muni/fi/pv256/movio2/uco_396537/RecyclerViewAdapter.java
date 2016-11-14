@@ -1,7 +1,6 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,12 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Objects;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
@@ -100,9 +97,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 ViewHolder_movie movieHolder = (ViewHolder_movie) holder;
                 Movie movie = (Movie) mItems.get(position);
                 movieHolder.mMovieTitle.setText(movie.getTitle());
-                movieHolder.mMovieRating.setText(Float.toString(movie.getPopularity()));
-                if(!movie.getBackdrop().isEmpty() && mContext != null) {
-                    movieHolder.mMovieImage.setImageDrawable(mContext.getDrawable(Integer.parseInt(movie.getBackdrop())));
+                movieHolder.mMovieRating.setText(Float.toString(Math.round(movie.getPopularity())));
+                if(movie.getBackdrop() != null && mContext != null) {
+                    movieHolder.mMovieImage.setImageBitmap(Model.getInstance().getPicture(movie.getBackdrop()));
                 }
                 break;
             case EMPTY_VIEW :
@@ -132,7 +129,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View view) {
                     if(context != null) {
-                        ((MainActivity) context).onMovieItemSelected(getAdapterPosition());
+                        ((MainActivity) context).onMovieClick(getAdapterPosition());
                     }
                 }
             };

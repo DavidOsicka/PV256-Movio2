@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
-
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 
 /**
@@ -27,6 +25,7 @@ public class ListViewFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager = null;
 
     private Context mContext = null;
+
 
     @Override
     public void onAttach(Context context) {
@@ -58,13 +57,8 @@ public class ListViewFragment extends Fragment {
             mRecyclerView.setLayoutManager(mLayoutManager);
         }
 
-        if(Model.ITEMS.isEmpty()) {
-            mAdapter = new RecyclerViewAdapter("Sorry, no data available");
-            mRecyclerView.setAdapter(mAdapter);
-        } else {
-            mAdapter = new RecyclerViewAdapter(Model.ITEMS, mContext);
-            mRecyclerView.setAdapter(mAdapter);
-        }
+        Model.getInstance().setContext(this);
+        reloadData();
 
         return view;
     }
@@ -98,5 +92,15 @@ public class ListViewFragment extends Fragment {
         super.onDestroy();
         // The activity is about to be destroyed.
         Log.d(TAG, " onDestroy method");
+    }
+
+    public void reloadData() {
+        if(Model.getInstance().getMovies().isEmpty()) {
+            mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+            mRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 }
