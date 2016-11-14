@@ -18,8 +18,8 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 
-public class MainActivity extends AppCompatActivity {
 
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     private static final String ARG_SHOW_DETAIL = "show_detail";
     private static final String PREFERENCES_NAME = "pref";
@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             editor.putString(THEME_NAME, "AppTheme1");
         }
-
         editor.apply();
 
         Intent intent = getIntent();
