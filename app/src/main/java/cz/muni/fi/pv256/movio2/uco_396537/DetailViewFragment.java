@@ -33,9 +33,6 @@ public class DetailViewFragment extends Fragment {
     private String coverPicture = "";
     private String backdropPicture = "";
 
-    private Context mContext = null;
-
-
 
     public static DetailViewFragment newInstance(Bundle args){
         DetailViewFragment fragment = new DetailViewFragment();
@@ -47,7 +44,6 @@ public class DetailViewFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, " onAttach method");
-        mContext = getActivity().getApplicationContext();   // melo by to byt tak, jinak by ta aktivita nemohla byt ukoncena a leakovalo by to. Mel by se drzet kontext na celou aplikaci
     }
 
     @Override
@@ -81,10 +77,10 @@ public class DetailViewFragment extends Fragment {
         if(descriptionView != null) {
             descriptionView.setText(movieDescription);
         }
-        if(coverView != null && mContext != null && !coverPicture.isEmpty()) {
+        if(coverView != null && !coverPicture.isEmpty()) {
             coverView.setImageBitmap(Model.getInstance().getPicture(coverPicture));
         }
-        if(backdropView != null && mContext != null && !backdropPicture.isEmpty()) {
+        if(backdropView != null && !backdropPicture.isEmpty()) {
             backdropView.setImageBitmap(Model.getInstance().getPicture(backdropPicture));
         }
         return view;

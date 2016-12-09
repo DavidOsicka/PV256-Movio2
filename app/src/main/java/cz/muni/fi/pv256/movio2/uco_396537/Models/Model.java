@@ -1,6 +1,5 @@
 package cz.muni.fi.pv256.movio2.uco_396537.Models;
 
-
 import android.graphics.Bitmap;
 import android.util.ArrayMap;
 
@@ -24,8 +23,6 @@ public class Model {
     private WeakReference<ListViewFragment> mContext = null;
 
 
-
-
     private Model() {}
 
     public static Model getInstance() {
@@ -37,9 +34,9 @@ public class Model {
 
     public void setContext(ListViewFragment listViewFragment) {
         mContext = new WeakReference<>(listViewFragment);
-        DownloadClient.getsInstance().setContext(listViewFragment);
+        //DownloadClient.getsInstance().setContext(listViewFragment);
         if(!mDownloaded) {
-            DownloadClient.getsInstance().execute();
+            //DownloadClient.getsInstance().execute();
             mDownloaded = true;
         }
     }

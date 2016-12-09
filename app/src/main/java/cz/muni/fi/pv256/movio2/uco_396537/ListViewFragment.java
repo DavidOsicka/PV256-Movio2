@@ -1,8 +1,12 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,7 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
+import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadIntentService;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
  * Created by david on 10.10.16.
@@ -43,6 +51,10 @@ public class ListViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, " onCreateView method ");
+
+        if(mContext != null) {
+            mContext.startService(new Intent(mContext, DownloadIntentService.class));
+        }
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.list_view_fragment, container, false);
@@ -101,6 +113,43 @@ public class ListViewFragment extends Fragment {
         } else {
             mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
             mRecyclerView.setAdapter(mAdapter);
+        }
+    }
+
+
+    public class ResponseReceiver extends BroadcastReceiver {
+
+        public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.ListViewFragmet.intent.action.LOCAL_DOWNLOAD";
+        public static final String NEW_MOVIES = "new_movies";
+        public static final String POPULAR_MOVIES = "popular_movies";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            ArrayList<Object> items = new ArrayList<>();
+            ArrayList<Movie> newMovies = intent.getParcelableArrayListExtra(NEW_MOVIES);
+            ArrayList<Movie> popularMovies = intent.getParcelableArrayListExtra(POPULAR_MOVIES);
+
+            if(newMovies != null) {
+                if (!newMovies.isEmpty()) {
+                    items.add(new String("NEW MOVIES"));
+                    items.addAll(newMovies);
+                }
+            }
+            if(popularMovies != null) {
+                if (!popularMovies.isEmpty()) {
+                    items.add(new String("POPULAR MOVIES"));
+                    items.addAll(popularMovies);
+                }
+            }
+
+            if(items.isEmpty()) {
+                mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+                mRecyclerView.setAdapter(mAdapter);
+            } else {
+                mAdapter = new RecyclerViewAdapter(items, mContext);
+                mRecyclerView.setAdapter(mAdapter);
+            }
         }
     }
 }

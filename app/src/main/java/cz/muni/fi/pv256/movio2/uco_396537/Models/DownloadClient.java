@@ -37,7 +37,9 @@ public class DownloadClient extends AsyncTask<Void, Void, ArrayList<Object>> {
 
     private static final String NEW_MOVIES_URL = "https://api.themoviedb.org/3/discover/movie?api_key=32bde8b225e94c4cbc6cacbe47c99cf1&primary_release_date.gte=" +
             DateTime.now().minusDays(7).toString("YYYY-MM-dd") + "&primary_release_date.lte=" + DateTime.now().toString("YYYY-MM-dd");
+
     private static final String POPULAR_MOVIES_URL = "https://api.themoviedb.org/3/discover/movie?api_key=32bde8b225e94c4cbc6cacbe47c99cf1&sort_by=popularity.desc";
+
     private static final String IMAGE_URL = "https://image.tmdb.org/t/p/original";
 
     private ArrayList<Movie> mNewMovies = new ArrayList<Movie>();

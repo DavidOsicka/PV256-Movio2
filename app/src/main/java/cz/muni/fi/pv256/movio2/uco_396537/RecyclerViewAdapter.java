@@ -31,7 +31,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-    public RecyclerViewAdapter(String noDataLabel) {
+    public  RecyclerViewAdapter(String noDataLabel) {
         mItems.add(noDataLabel);
         noData = true;
     }
@@ -98,7 +98,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Movie movie = (Movie) mItems.get(position);
                 movieHolder.mMovieTitle.setText(movie.getTitle());
                 movieHolder.mMovieRating.setText(Float.toString(Math.round(movie.getPopularity())));
-                if(movie.getBackdrop() != null && mContext != null) {
+                if(movie.getBackdrop() != null) {
                     movieHolder.mMovieImage.setImageBitmap(Model.getInstance().getPicture(movie.getBackdrop()));
                 }
                 break;
