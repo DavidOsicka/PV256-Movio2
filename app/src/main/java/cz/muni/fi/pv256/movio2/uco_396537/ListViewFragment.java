@@ -53,7 +53,14 @@ public class ListViewFragment extends Fragment {
         Log.d(TAG, " onCreateView method ");
 
         if(mContext != null) {
-            mContext.startService(new Intent(mContext, DownloadIntentService.class));
+//            mContext.startService(new Intent(mContext, DownloadIntentService.class));
+            Intent newMovieDownloadIntent = new Intent(mContext, DownloadIntentService.class);
+            newMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.NEW_MOVIE_TYPE);
+            mContext.startService(newMovieDownloadIntent);
+
+            Intent popularMovieDownloadIntent = new Intent(mContext, DownloadIntentService.class);
+            popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
+            mContext.startService(popularMovieDownloadIntent);
         }
 
         // Inflate the layout for this fragment
@@ -113,43 +120,6 @@ public class ListViewFragment extends Fragment {
         } else {
             mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
             mRecyclerView.setAdapter(mAdapter);
-        }
-    }
-
-
-    public class ResponseReceiver extends BroadcastReceiver {
-
-        public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.ListViewFragmet.intent.action.LOCAL_DOWNLOAD";
-        public static final String NEW_MOVIES = "new_movies";
-        public static final String POPULAR_MOVIES = "popular_movies";
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            ArrayList<Object> items = new ArrayList<>();
-            ArrayList<Movie> newMovies = intent.getParcelableArrayListExtra(NEW_MOVIES);
-            ArrayList<Movie> popularMovies = intent.getParcelableArrayListExtra(POPULAR_MOVIES);
-
-            if(newMovies != null) {
-                if (!newMovies.isEmpty()) {
-                    items.add(new String("NEW MOVIES"));
-                    items.addAll(newMovies);
-                }
-            }
-            if(popularMovies != null) {
-                if (!popularMovies.isEmpty()) {
-                    items.add(new String("POPULAR MOVIES"));
-                    items.addAll(popularMovies);
-                }
-            }
-
-            if(items.isEmpty()) {
-                mAdapter = new RecyclerViewAdapter("Sorry, no data available");
-                mRecyclerView.setAdapter(mAdapter);
-            } else {
-                mAdapter = new RecyclerViewAdapter(items, mContext);
-                mRecyclerView.setAdapter(mAdapter);
-            }
         }
     }
 }

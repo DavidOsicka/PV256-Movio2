@@ -18,7 +18,7 @@ public class Movie implements Parcelable {
     @SerializedName("backdrop_path")
     private String backdrop;
     private float popularity;
-
+    private String overview;
 
     public Movie() { }
 
@@ -28,14 +28,16 @@ public class Movie implements Parcelable {
         coverPath = parcel.readString();
         backdrop = parcel.readString();
         popularity = parcel.readFloat();
+        overview = parcel.readString();
     }
 
-    public Movie(String title, long releaseDate, String coverPath, String backdrop, float popularity) {
+    public Movie(String title, long releaseDate, String coverPath, String backdrop, float popularity, String overview) {
         this.title = title;
         this.releaseDate = releaseDate;
         this.coverPath = coverPath;
         this.backdrop = backdrop;
         this.popularity = popularity;
+        this.overview = overview;
     }
 
     @Override
@@ -50,6 +52,7 @@ public class Movie implements Parcelable {
         parcel.writeString(coverPath);
         parcel.writeString(backdrop);
         parcel.writeFloat(popularity);
+        parcel.writeString(overview);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
@@ -72,6 +75,7 @@ public class Movie implements Parcelable {
         result = prime * result + (coverPath == null ? 0 : coverPath.hashCode());
         result = prime * result + (backdrop == null ? 0 : backdrop.hashCode());
         result = prime * result + (int)popularity;
+        result = prime * result + (overview == null ? 0 : overview.hashCode());
 
         return result;
     }
@@ -111,4 +115,6 @@ public class Movie implements Parcelable {
         this.popularity = popularity;
     }
 
+    public String getOverview() { return overview; }
+    public void setOverview(String overview) { this.overview = overview; }
 }

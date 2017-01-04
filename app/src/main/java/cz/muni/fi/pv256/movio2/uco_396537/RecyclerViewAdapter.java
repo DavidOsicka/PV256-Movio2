@@ -31,7 +31,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-    public  RecyclerViewAdapter(String noDataLabel) {
+    public RecyclerViewAdapter(String noDataLabel) {
         mItems.add(noDataLabel);
         noData = true;
     }
@@ -58,7 +58,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return -1;
     }
 
-
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -67,7 +66,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LayoutInflater inflater =  LayoutInflater.from(parent.getContext());
         View view;
         switch(viewType) {
-            case  CATEGORY_VIEW :
+            case CATEGORY_VIEW :
                 view = inflater.inflate(R.layout.category_view, parent, false);
                 return new ViewHolder_category(view);
             case MOVIE_VIEW:

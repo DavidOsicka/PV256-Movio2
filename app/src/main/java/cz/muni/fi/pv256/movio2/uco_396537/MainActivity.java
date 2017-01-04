@@ -1,10 +1,15 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +18,9 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
@@ -26,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String THEME_NAME = "theme";
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
-
+    private DataReceiver mReceiver = null;
     private boolean isTablet = false;
-
 
 
     @Override
@@ -80,6 +87,50 @@ public class MainActivity extends AppCompatActivity {
         ImageLoader.getInstance().init(config);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // The activity is about to become visible.
+        Log.d(TAG, " onStart method");
+
+        mReceiver = new DataReceiver();
+        IntentFilter intentFilter = new IntentFilter(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,intentFilter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // The activity has become visible (it is now "resumed").
+        Log.d(TAG, " onResume method");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Another activity is taking focus (this activity is about to be "paused").
+        Log.d(TAG, " onPause method");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // The activity is no longer visible (it is now "stopped")
+        Log.d(TAG, " onStop method");
+
+        if(mReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
+        };
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // The activity is about to be destroyed.
+        Log.d(TAG, " onDestroy method");
+    }
+
 
     public void onMovieClick(int item) {
         if(item < 0 || item >= Model.getInstance().getMovies().size()) {
@@ -121,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     public void changeTheme(View view) {
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
         SharedPreferences.Editor editor = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit();
@@ -137,36 +189,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public class DataReceiver extends BroadcastReceiver {
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // The activity is about to become visible.
-        Log.d(TAG, " onStart method");
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // The activity has become visible (it is now "resumed").
-        Log.d(TAG, " onResume method");
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Another activity is taking focus (this activity is about to be "paused").
-        Log.d(TAG, " onPause method");
-        //onSaveInstanceState(new Bundle());
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // The activity is no longer visible (it is now "stopped")
-        Log.d(TAG, " onStop method");
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // The activity is about to be destroyed.
-        Log.d(TAG, " onDestroy method");
+        public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.Model.intent.action.LOCAL_DOWNLOAD";
+//        public static final String NEW_MOVIES = "new_movies";
+//        public static final String POPULAR_MOVIES = "popular_movies";
+        public static final String MOVIES = "movies";
+        public static final String PICTURES = "pictures";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
+            ArrayList<Movie> movies = intent.getParcelableArrayListExtra(MOVIES);
+//            ArrayList<Movie> newMovies = intent.getParcelableArrayListExtra(NEW_MOVIES);
+//            ArrayList<Movie> popularMovies = intent.getParcelableArrayListExtra(POPULAR_MOVIES);
+            HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
+            ArrayList<Object> items = new ArrayList<Object>();
+
+//            if(newMovies != null) {
+//                if (!newMovies.isEmpty()) {
+//                    items.add(new String("NEW MOVIES"));
+//                    items.addAll(newMovies);
+//                }
+//            }
+//            if(popularMovies != null) {
+//                if (!popularMovies.isEmpty()) {
+//                    items.add(new String("POPULAR MOVIES"));
+//                    items.addAll(popularMovies);
+//                }
+//            }
+//            Model.getInstance().setMovies(items);
+
+            if(movieType == Model.NEW_MOVIE_TYPE) {
+                Model.getInstance().setNewMovies(movies);
+            } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
+                Model.getInstance().setPopularMovies(movies);
+            }
+            Model.getInstance().setPicture(pictures);
+            Model.getInstance().reloadData();
+        }
     }
 }

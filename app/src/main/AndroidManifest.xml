@@ -33,8 +33,10 @@
         </activity>
 
         <service
-            android:name=".Models.DownloadIntentService">
-        </service>
+            android:name=".Models.DownloadIntentService"/>
+
+        <!--<receiver-->
+            <!--android:name=".Models.Model$DataReceiver"/>-->
 
     </application>
 

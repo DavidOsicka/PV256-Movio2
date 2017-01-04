@@ -1,10 +1,10 @@
 package cz.muni.fi.pv256.movio2.uco_396537.Models;
 
 import android.graphics.Bitmap;
-import android.util.ArrayMap;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
 
@@ -15,15 +15,18 @@ import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
 
 public class Model {
 
-    private ArrayList<Object> mItems = new ArrayList<Object>();
-    private ArrayMap<String, Bitmap> mPictures = new ArrayMap<>();
+    public static final String MOVIE_TYPE = "Movie type";
+    public static final int NEW_MOVIE_TYPE = 1, POPULAR_MOVIE_TYPE = 2;
 
+//    private ArrayList<Object> mItems = new ArrayList<Object>();
+    private ArrayList<Object> mNewMovies = new ArrayList<Object>();
+    private ArrayList<Object> mPopularMovies = new ArrayList<Object>();
+    private HashMap<String, Bitmap> mPictures = new HashMap<>();
     private static Model sInstance = null;
-    private boolean mDownloaded = false;
     private WeakReference<ListViewFragment> mContext = null;
 
 
-    private Model() {}
+    private Model() { }
 
     public static Model getInstance() {
         if(sInstance == null) {
@@ -34,35 +37,45 @@ public class Model {
 
     public void setContext(ListViewFragment listViewFragment) {
         mContext = new WeakReference<>(listViewFragment);
-        //DownloadClient.getsInstance().setContext(listViewFragment);
-        if(!mDownloaded) {
-            //DownloadClient.getsInstance().execute();
-            mDownloaded = true;
-        }
     }
 
-    public  void setMovies(ArrayList<Object> movies) {
-        mItems = movies;
-        if(mContext != null) {
-            mContext.get().reloadData();
-        }
+//    public void setMovies(ArrayList<Object> movies) {
+//        mItems = movies;
+//    }
+
+    public void setNewMovies(ArrayList<Movie> movies) {
+        mNewMovies.clear();
+        mNewMovies.add(new String("NEW MOVIES"));
+        mNewMovies.addAll(movies);
+    }
+
+    public void setPopularMovies(ArrayList<Movie> movies) {
+        mPopularMovies.clear();
+        mPopularMovies.add(new String("POPULAR MOVIES"));
+        mPopularMovies.addAll(movies);
     }
 
     public ArrayList<Object> getMovies() {
-        return mItems;
+        ArrayList<Object> items = new ArrayList<Object>();
+        items.addAll(mNewMovies);
+        items.addAll(mPopularMovies);
+        return items;
     }
 
-    public void setPicture(String key, Bitmap picture) {
-        mPictures.put(key, picture);
-        if(mContext != null) {
-            //mContext.get().reloadData();
-        }
+    public void setPicture(HashMap<String, Bitmap> pictures) {
+        mPictures.putAll(pictures);
     }
 
     public Bitmap getPicture(String key) {
         if(mPictures.containsKey(key)) {
             return mPictures.get(key);
         }
-        return Bitmap.createBitmap(0,0, Bitmap.Config.RGB_565);
+        return Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
+    }
+
+    public void reloadData() {
+        if(mContext != null) {
+            mContext.get().reloadData();
+        }
     }
 }

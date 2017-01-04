@@ -2,6 +2,7 @@ package cz.muni.fi.pv256.movio2.uco_396537.Models;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
@@ -19,9 +20,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
+import cz.muni.fi.pv256.movio2.uco_396537.MainActivity;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -40,7 +42,6 @@ public class DownloadIntentService extends IntentService {
     private static final String NEW_MOVIES_URL = "primary_release_date.gte=" +
             DateTime.now().minusDays(7).toString("YYYY-MM-dd") + "&primary_release_date.lte=" + DateTime.now().toString("YYYY-MM-dd");
 
-//    private ArrayList<Object> mItems = new ArrayList<>();
     private Retrofit mRetrofit = null;
 
 
@@ -77,7 +78,8 @@ public class DownloadIntentService extends IntentService {
                 .registerTypeAdapter(Long.class, deserializer)
                 .create();
 
-        mRetrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
@@ -85,67 +87,124 @@ public class DownloadIntentService extends IntentService {
     @Override
     protected void onHandleIntent (Intent intent) {
 
-        ArrayList<Movie> newMovies = new ArrayList<>();
-        ArrayList<Movie> popularMovies = new ArrayList<>();
-
+        ArrayList<Movie> movies = new ArrayList<>();
+        HashMap<String, Bitmap> pictures = new HashMap<>();
+        int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
         DownloadInterface downloadService = mRetrofit.create(DownloadInterface.class);
+        Call<MovieListJson> moviesCall = null;
 
-//        Call<ArrayList<Movie>> newMoviesCall = downloadService.download(API_KEY, NEW_MOVIES_URL);
-//        Call<ArrayList<Movie>> popularMoviesCall = downloadService.download(API_KEY, POPULAR_MOVIES_URL);
-
-        Call<ArrayList<Movie>> newMoviesCall = downloadService.download();
-        Call<ArrayList<Movie>> popularMoviesCall = downloadService.download();
+        if(movieType == Model.NEW_MOVIE_TYPE) {
+//            moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
+            moviesCall = downloadService.downloadNewMovies();
+        } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
+            moviesCall = downloadService.downloadPopularMovies(API_KEY, POPULAR_MOVIES_URL);
+        }
 
         try {
-            Response<ArrayList<Movie>> newMoviesResponse = newMoviesCall.execute();
-            Response<ArrayList<Movie>> popularMoviesResponse = popularMoviesCall.execute();
+            Response<MovieListJson> moviesResponse = moviesCall.execute();
+            movies = moviesResponse.body().results;
 
-            newMovies = newMoviesResponse.body();
-            popularMovies = popularMoviesResponse.body();
+            if(movies != null) {
+                if (!movies.isEmpty()) {
+                    for (Movie movie : movies) {
+                        if(movie.getBackdrop() != null) {
+                            pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
+                        }
+                        if(movie.getCoverPath() != null) {
+                            pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
+                        }
+                    }
+                }
+            }
+        }
+        catch(NullPointerException e) {
+            e.printStackTrace();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+        catch(ExecutionException e) {
+            e.printStackTrace();
+        }
 
+        //Broadcast
+        Intent brocastIntent = new Intent();
+        brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
+        brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+        brocastIntent.putExtra(Model.MOVIE_TYPE, movieType);
+        brocastIntent.putExtra(MainActivity.DataReceiver.MOVIES, movies);
+        brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.sendBroadcast(brocastIntent);
+    }
+
+
+//    @Override
+//    protected void onHandleIntent (Intent intent) {
+//
+//        ArrayList<Movie> newMovies = new ArrayList<>();
+//        ArrayList<Movie> popularMovies = new ArrayList<>();
+//        HashMap<String, Bitmap> pictures = new HashMap<>();
+//
+//        DownloadInterface downloadService1 = mRetrofit.create(DownloadInterface.class);
+//        Call<MovieListJson> newMoviesCall = downloadService1.download(API_KEY, NEW_MOVIES_URL);
+//
+//        DownloadInterface downloadService2 = mRetrofit.create(DownloadInterface.class);
+//        Call<MovieListJson> popularMoviesCall = downloadService2.download(API_KEY, POPULAR_MOVIES_URL);
+//
+//        try {
+//            Response<MovieListJson> newMoviesResponse = newMoviesCall.execute();
+//            Response<MovieListJson> popularMoviesResponse = popularMoviesCall.execute();
+//
+//            newMovies = newMoviesResponse.body().results;
+//            popularMovies = popularMoviesResponse.body().results;
+//
 //            if(newMovies != null) {
 //                if (!newMovies.isEmpty()) {
-//                    mItems.add(new String("NEW MOVIES"));
-//                    mItems.addAll(newMovies);
-//
 //                    for (Movie movie : newMovies) {
-//                        Model.getInstance().setPicture(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
-//                        Model.getInstance().setPicture(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
+//                        pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
+//                        pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
 //                    }
 //                }
 //            }
 //            if(popularMovies != null) {
 //                if (!popularMovies.isEmpty()) {
-//                    mItems.add(new String("POPULAR MOVIES"));
-//                    mItems.addAll(popularMovies);
-//
 //                    for (Movie movie : popularMovies) {
-//                        Model.getInstance().setPicture(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
-//                        Model.getInstance().setPicture(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
+//                        pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
+//                        pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
 //                    }
 //                }
 //            }
-//            Model.getInstance().setMovies(mItems);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
 //        catch(InterruptedException e) {
 //            e.printStackTrace();
 //        }
 //        catch(ExecutionException e) {
 //            e.printStackTrace();
 //        }
+//
+//        //Broadcast
+//        Intent brocastIntent = new Intent();
+//        brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
+//        brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+//
+//        brocastIntent.putExtra(MainActivity.DataReceiver.NEW_MOVIES, newMovies);
+//        brocastIntent.putExtra(MainActivity.DataReceiver.POPULAR_MOVIES, popularMovies);
+//        brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
+//
+//        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+//        localBroadcastManager.sendBroadcast(brocastIntent);
+//    }
 
-
-        //Broadcast
-        Intent brocastIntent = new Intent();
-        brocastIntent.setAction(ListViewFragment.ResponseReceiver.LOCAL_DOWNLOAD);
-        brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        brocastIntent.putExtra(ListViewFragment.ResponseReceiver.NEW_MOVIES, newMovies);
-        brocastIntent.putExtra(ListViewFragment.ResponseReceiver.POPULAR_MOVIES, popularMovies);
-
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.sendBroadcast(brocastIntent);
+    public class MovieListJson {
+        public ArrayList<Movie> results;
     }
 }
