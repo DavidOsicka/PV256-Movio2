@@ -143,67 +143,6 @@ public class DownloadIntentService extends IntentService {
         localBroadcastManager.sendBroadcast(brocastIntent);
     }
 
-
-//    @Override
-//    protected void onHandleIntent (Intent intent) {
-//
-//        ArrayList<Movie> newMovies = new ArrayList<>();
-//        ArrayList<Movie> popularMovies = new ArrayList<>();
-//        HashMap<String, Bitmap> pictures = new HashMap<>();
-//
-//        DownloadInterface downloadService1 = mRetrofit.create(DownloadInterface.class);
-//        Call<MovieListJson> newMoviesCall = downloadService1.download(API_KEY, NEW_MOVIES_URL);
-//
-//        DownloadInterface downloadService2 = mRetrofit.create(DownloadInterface.class);
-//        Call<MovieListJson> popularMoviesCall = downloadService2.download(API_KEY, POPULAR_MOVIES_URL);
-//
-//        try {
-//            Response<MovieListJson> newMoviesResponse = newMoviesCall.execute();
-//            Response<MovieListJson> popularMoviesResponse = popularMoviesCall.execute();
-//
-//            newMovies = newMoviesResponse.body().results;
-//            popularMovies = popularMoviesResponse.body().results;
-//
-//            if(newMovies != null) {
-//                if (!newMovies.isEmpty()) {
-//                    for (Movie movie : newMovies) {
-//                        pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
-//                        pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
-//                    }
-//                }
-//            }
-//            if(popularMovies != null) {
-//                if (!popularMovies.isEmpty()) {
-//                    for (Movie movie : popularMovies) {
-//                        pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
-//                        pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
-//                    }
-//                }
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        catch(InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        catch(ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //Broadcast
-//        Intent brocastIntent = new Intent();
-//        brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
-//        brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-//
-//        brocastIntent.putExtra(MainActivity.DataReceiver.NEW_MOVIES, newMovies);
-//        brocastIntent.putExtra(MainActivity.DataReceiver.POPULAR_MOVIES, popularMovies);
-//        brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
-//
-//        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-//        localBroadcastManager.sendBroadcast(brocastIntent);
-//    }
-
     public class MovieListJson {
         public ArrayList<Movie> results;
     }

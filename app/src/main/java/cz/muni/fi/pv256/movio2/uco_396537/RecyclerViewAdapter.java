@@ -1,6 +1,7 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -99,11 +100,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 movieHolder.mMovieRating.setText(Float.toString(Math.round(movie.getPopularity())));
                 if(movie.getBackdrop() != null) {
                     movieHolder.mMovieImage.setImageBitmap(Model.getInstance().getPicture(movie.getBackdrop()));
+                } else {
+                    movieHolder.mMovieImage.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
                 }
                 break;
             case EMPTY_VIEW :
                 ViewHolder_empty emptyView = (ViewHolder_empty) holder;
-                emptyView.mEmptyListLabel.setText(mItems.get(position).toString() /*noDataLabel*/);
+                emptyView.mEmptyListLabel.setText(mItems.get(position).toString());
                 break;
         }
     }

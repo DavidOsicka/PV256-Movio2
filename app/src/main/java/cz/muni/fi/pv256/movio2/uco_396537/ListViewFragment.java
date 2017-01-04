@@ -52,17 +52,6 @@ public class ListViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, " onCreateView method ");
 
-        if(mContext != null) {
-//            mContext.startService(new Intent(mContext, DownloadIntentService.class));
-            Intent newMovieDownloadIntent = new Intent(mContext, DownloadIntentService.class);
-            newMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.NEW_MOVIE_TYPE);
-            mContext.startService(newMovieDownloadIntent);
-
-            Intent popularMovieDownloadIntent = new Intent(mContext, DownloadIntentService.class);
-            popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
-            mContext.startService(popularMovieDownloadIntent);
-        }
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.list_view_fragment, container, false);
 

@@ -1,6 +1,7 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -77,11 +78,15 @@ public class DetailViewFragment extends Fragment {
         if(descriptionView != null) {
             descriptionView.setText(movieDescription);
         }
-        if(coverView != null && !coverPicture.isEmpty()) {
+        if(coverView != null) {
             coverView.setImageBitmap(Model.getInstance().getPicture(coverPicture));
+        } else {
+            coverView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
         }
-        if(backdropView != null && !backdropPicture.isEmpty()) {
+        if(backdropView != null) {
             backdropView.setImageBitmap(Model.getInstance().getPicture(backdropPicture));
+        } else {
+            backdropView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
         }
         return view;
     }

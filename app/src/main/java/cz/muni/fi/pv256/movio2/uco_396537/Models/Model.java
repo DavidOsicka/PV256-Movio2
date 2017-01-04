@@ -18,7 +18,6 @@ public class Model {
     public static final String MOVIE_TYPE = "Movie type";
     public static final int NEW_MOVIE_TYPE = 1, POPULAR_MOVIE_TYPE = 2;
 
-//    private ArrayList<Object> mItems = new ArrayList<Object>();
     private ArrayList<Object> mNewMovies = new ArrayList<Object>();
     private ArrayList<Object> mPopularMovies = new ArrayList<Object>();
     private HashMap<String, Bitmap> mPictures = new HashMap<>();
@@ -38,10 +37,6 @@ public class Model {
     public void setContext(ListViewFragment listViewFragment) {
         mContext = new WeakReference<>(listViewFragment);
     }
-
-//    public void setMovies(ArrayList<Object> movies) {
-//        mItems = movies;
-//    }
 
     public void setNewMovies(ArrayList<Movie> movies) {
         mNewMovies.clear();

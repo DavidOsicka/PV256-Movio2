@@ -22,6 +22,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadIntentService;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
@@ -68,6 +69,14 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
         }
 
+        Intent newMovieDownloadIntent = new Intent(this, DownloadIntentService.class);
+        newMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.NEW_MOVIE_TYPE);
+        startService(newMovieDownloadIntent);
+
+        Intent popularMovieDownloadIntent = new Intent(this, DownloadIntentService.class);
+        popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
+        startService(popularMovieDownloadIntent);
+        
         ListViewFragment listViewFragment = new ListViewFragment();
         DetailViewFragment detailViewFragment = new DetailViewFragment();
 
@@ -192,34 +201,15 @@ public class MainActivity extends AppCompatActivity {
     public class DataReceiver extends BroadcastReceiver {
 
         public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.Model.intent.action.LOCAL_DOWNLOAD";
-//        public static final String NEW_MOVIES = "new_movies";
-//        public static final String POPULAR_MOVIES = "popular_movies";
         public static final String MOVIES = "movies";
         public static final String PICTURES = "pictures";
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
             ArrayList<Movie> movies = intent.getParcelableArrayListExtra(MOVIES);
-//            ArrayList<Movie> newMovies = intent.getParcelableArrayListExtra(NEW_MOVIES);
-//            ArrayList<Movie> popularMovies = intent.getParcelableArrayListExtra(POPULAR_MOVIES);
             HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
             ArrayList<Object> items = new ArrayList<Object>();
-
-//            if(newMovies != null) {
-//                if (!newMovies.isEmpty()) {
-//                    items.add(new String("NEW MOVIES"));
-//                    items.addAll(newMovies);
-//                }
-//            }
-//            if(popularMovies != null) {
-//                if (!popularMovies.isEmpty()) {
-//                    items.add(new String("POPULAR MOVIES"));
-//                    items.addAll(popularMovies);
-//                }
-//            }
-//            Model.getInstance().setMovies(items);
 
             if(movieType == Model.NEW_MOVIE_TYPE) {
                 Model.getInstance().setNewMovies(movies);
