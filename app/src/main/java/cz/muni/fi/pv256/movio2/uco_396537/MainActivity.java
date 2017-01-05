@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadClient;
+import cz.muni.fi.pv256.movio2.uco_396537.Download.DownloadClient;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 

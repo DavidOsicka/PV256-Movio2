@@ -1,5 +1,6 @@
-package cz.muni.fi.pv256.movio2.uco_396537.Models;
+package cz.muni.fi.pv256.movio2.uco_396537.Download;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Download.DownloadClient;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

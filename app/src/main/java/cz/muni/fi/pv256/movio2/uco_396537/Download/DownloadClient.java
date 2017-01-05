@@ -1,4 +1,4 @@
-package cz.muni.fi.pv256.movio2.uco_396537.Models;
+package cz.muni.fi.pv256.movio2.uco_396537.Download;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -6,24 +6,17 @@ import android.graphics.Bitmap;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
 
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import cz.muni.fi.pv256.movio2.uco_396537.MainActivity;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
