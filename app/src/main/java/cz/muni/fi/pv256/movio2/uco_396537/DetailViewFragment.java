@@ -93,12 +93,11 @@ public class DetailViewFragment extends Fragment {
 
     @Override
     public void setArguments(Bundle args) {
-        //super.setArguments(args);
         if(args != null && args.containsKey("Movie")) {
             Movie movie = args.getParcelable("Movie");
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(movie.getReleaseDate());
-            movieTitleYear = movie.getTitle() + System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
+            movieTitleYear = movie.getTitle(); // + System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
             coverPicture = movie.getCoverPath();
             backdropPicture = movie.getBackdrop();
             movieDescription = movie.getOverview();

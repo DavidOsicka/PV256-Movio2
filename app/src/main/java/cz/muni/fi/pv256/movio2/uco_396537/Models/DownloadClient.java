@@ -33,54 +33,28 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by david on 23.11.16.
  */
 
-public class DownloadIntentService extends IntentService {
+public class DownloadClient extends IntentService {
 
     private static final String BASE_URL = "https://api.themoviedb.org/";
     private static final String API_KEY = "32bde8b225e94c4cbc6cacbe47c99cf1";
     private static final String IMAGE_URL = "https://image.tmdb.org/t/p/original";
-    private static final String POPULAR_MOVIES_URL = "sort_by=popularity.desc";
-    private static final String NEW_MOVIES_URL = "primary_release_date.gte=" +
-            DateTime.now().minusDays(7).toString("YYYY-MM-dd") + "&primary_release_date.lte=" + DateTime.now().toString("YYYY-MM-dd");
+    private static final String POPULAR_MOVIES_URL = "popularity.desc";
+    private static final String NEW_MOVIES_URL = DateTime.now().minusDays(7).toString("YYYY-MM-dd");
 
     private Retrofit mRetrofit = null;
 
 
-    public DownloadIntentService() {
-        super(DownloadIntentService.class.getName());
+    public DownloadClient() {
+        super(DownloadClient.class.getName());
     }
 
     @Override
     public void onCreate(){
         super.onCreate();
 
-        JsonDeserializer<Long> deserializer = new JsonDeserializer<Long>() {
-            @Override
-            public Long deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context){
-                if(json==null){
-                    return new Long(0);
-                }
-                else{
-                    String dateString = json.getAsString();
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    long dateLong = 0;
-                    try {
-                        Date releaseDate = simpleDateFormat.parse(dateString);
-                        dateLong = releaseDate.getTime();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return new Long(dateLong);
-                }
-            }
-        };
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Long.class, deserializer)
-                .create();
-
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create(/*gson*/))
                 .build();
     }
 
@@ -94,8 +68,7 @@ public class DownloadIntentService extends IntentService {
         Call<MovieListJson> moviesCall = null;
 
         if(movieType == Model.NEW_MOVIE_TYPE) {
-//            moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
-            moviesCall = downloadService.downloadNewMovies();
+            moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
         } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
             moviesCall = downloadService.downloadPopularMovies(API_KEY, POPULAR_MOVIES_URL);
         }
@@ -130,17 +103,27 @@ public class DownloadIntentService extends IntentService {
             e.printStackTrace();
         }
 
-        //Broadcast
-        Intent brocastIntent = new Intent();
-        brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
-        brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        if(movies.isEmpty()) {
+            Intent brocastIntent = new Intent();
+            brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
+            brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
-        brocastIntent.putExtra(Model.MOVIE_TYPE, movieType);
-        brocastIntent.putExtra(MainActivity.DataReceiver.MOVIES, movies);
-        brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
+            brocastIntent.putExtra(MainActivity.DataReceiver.ERROR, true);
 
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.sendBroadcast(brocastIntent);
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+            localBroadcastManager.sendBroadcast(brocastIntent);
+        } else {
+            Intent brocastIntent = new Intent();
+            brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
+            brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+            brocastIntent.putExtra(Model.MOVIE_TYPE, movieType);
+            brocastIntent.putExtra(MainActivity.DataReceiver.MOVIES, movies);
+            brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
+
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+            localBroadcastManager.sendBroadcast(brocastIntent);
+        }
     }
 
     public class MovieListJson {

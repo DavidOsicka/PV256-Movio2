@@ -10,11 +10,10 @@ import retrofit2.http.Query;
 
 public interface DownloadInterface {
     @GET("3/discover/movie")
-    Call<DownloadIntentService.MovieListJson> downloadPopularMovies(@Query("api_key") String apiKey, @Query("&") String MovieSection);
+    Call<DownloadClient.MovieListJson> downloadPopularMovies(@Query("api_key") String apiKey, @Query("sort_by") String MovieSection);
+//    "https://api.themoviedb.org/3/discover/movie?api_key=32bde8b225e94c4cbc6cacbe47c99cf1&sort_by=popularity.desc"
 
-//    @GET("3/discover/movie")
-//    Call<DownloadIntentService.MovieListJson> downloadNewMovies(@Query("api_key") String apiKey, @Query("&") String MovieSection);
-
-    @GET("3/discover/movie?api_key=32bde8b225e94c4cbc6cacbe47c99cf1&primary_release_date.gte=2016-12-27&primary_release_date.lte=2017-01-03")
-    Call<DownloadIntentService.MovieListJson> downloadNewMovies();
+    @GET("3/discover/movie")
+    Call<DownloadClient.MovieListJson> downloadNewMovies(@Query("api_key") String apiKey, @Query("primary_release_date.gte") String MovieSection);
+//    "https://api.themoviedb.org/3/discover/movie?api_key=32bde8b225e94c4cbc6cacbe47c99cf1&primary_release_date.gte=2016-12-27&primary_release_date.lte=2017-01-03"
 }
