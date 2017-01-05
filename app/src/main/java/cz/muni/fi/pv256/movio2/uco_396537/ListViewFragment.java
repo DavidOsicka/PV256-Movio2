@@ -1,12 +1,8 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,11 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
-import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadIntentService;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
-import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
  * Created by david on 10.10.16.

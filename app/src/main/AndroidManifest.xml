@@ -33,7 +33,7 @@
         </activity>
 
         <service
-            android:name=".Models.DownloadIntentService"/>
+            android:name=".Models.DownloadClient"/>
 
         <!--<receiver-->
             <!--android:name=".Models.Model$DataReceiver"/>-->

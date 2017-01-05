@@ -70,7 +70,9 @@ public class Model {
 
     public void reloadData() {
         if(mContext != null) {
-            mContext.get().reloadData();
+            if(mContext.get() != null) {
+                mContext.get().reloadData();
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ public class Movie implements Parcelable {
     private String coverPath;
     @SerializedName("backdrop_path")
     private String backdrop;
+    //@SerializedName("vote_average") // nevim jestli má zobrazovat popularity nebo vore avarege, každý jiný čísla
     private float popularity;
     private String overview;
 

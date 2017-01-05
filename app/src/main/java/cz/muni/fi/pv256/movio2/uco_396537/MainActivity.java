@@ -1,5 +1,6 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,10 +21,11 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadIntentService;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.DownloadClient;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
     private DataReceiver mReceiver = null;
+    private NotificationManager mNotificationManager = null;
     private boolean isTablet = false;
 
 
@@ -69,14 +73,17 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
         }
 
-        Intent newMovieDownloadIntent = new Intent(this, DownloadIntentService.class);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        downloadingNotification();
+
+        Intent newMovieDownloadIntent = new Intent(this, DownloadClient.class);
         newMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.NEW_MOVIE_TYPE);
         startService(newMovieDownloadIntent);
 
-        Intent popularMovieDownloadIntent = new Intent(this, DownloadIntentService.class);
+        Intent popularMovieDownloadIntent = new Intent(this, DownloadClient.class);
         popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
         startService(popularMovieDownloadIntent);
-        
+
         ListViewFragment listViewFragment = new ListViewFragment();
         DetailViewFragment detailViewFragment = new DetailViewFragment();
 
@@ -103,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onStart method");
 
         mReceiver = new DataReceiver();
+        mReceiver.setContext(this);
         IntentFilter intentFilter = new IntentFilter(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,intentFilter);
@@ -197,27 +205,86 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void downloadingNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
+                .setContentTitle("Downloading")
+                .setContentText("Movio2 downloading data")
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setProgress(0, 0, true)
+                .setAutoCancel(true);
+
+        mNotificationManager.notify(0, downloadingNotification.build());
+    }
+
+    public void finishedNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
+                .setContentTitle("Downloading finished")
+                .setContentText("Movio2 finished downloading of data")
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setAutoCancel(true);
+
+        mNotificationManager.notify(0, downloadingNotification.build());
+    }
+
+    public void errorNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
+                .setContentTitle("ERROR")
+                .setContentText("Movio2 can not download data")
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setAutoCancel(true);
+
+        mNotificationManager.notify(0, downloadingNotification.build());
+    }
 
     public class DataReceiver extends BroadcastReceiver {
 
         public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.Model.intent.action.LOCAL_DOWNLOAD";
         public static final String MOVIES = "movies";
         public static final String PICTURES = "pictures";
+        public static final String ERROR = "error";
+
+        private WeakReference<MainActivity> mContext = null;
+
+        public void setContext(MainActivity mainActivity) {
+            mContext = new WeakReference<>(mainActivity);
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
-            ArrayList<Movie> movies = intent.getParcelableArrayListExtra(MOVIES);
-            HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
-            ArrayList<Object> items = new ArrayList<Object>();
 
-            if(movieType == Model.NEW_MOVIE_TYPE) {
-                Model.getInstance().setNewMovies(movies);
-            } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
-                Model.getInstance().setPopularMovies(movies);
+            if(intent.getBooleanExtra(ERROR, false)) {
+                if(mContext != null) {
+                    mContext.get().errorNotification();
+                }
+
+            } else {
+                int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
+                ArrayList<Movie> movies = intent.getParcelableArrayListExtra(MOVIES);
+                HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
+                ArrayList<Object> items = new ArrayList<Object>();
+
+                if(movieType == Model.NEW_MOVIE_TYPE) {
+                    Model.getInstance().setNewMovies(movies);
+                } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
+                    Model.getInstance().setPopularMovies(movies);
+                    if(mContext != null) {
+                        mContext.get().finishedNotification();
+                    }
+                }
+                Model.getInstance().setPicture(pictures);
+                Model.getInstance().reloadData();
             }
-            Model.getInstance().setPicture(pictures);
-            Model.getInstance().reloadData();
         }
     }
+
+
 }
