@@ -10,12 +10,17 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -25,6 +30,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Download.DownloadClient;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
@@ -36,11 +42,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String ARG_SHOW_DETAIL = "show_detail";
     private static final String PREFERENCES_NAME = "pref";
     private static final String THEME_NAME = "theme";
+    private static final int LOADER_FIND_ALL = 4;
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
+    private ListViewFragment mListViewFragment = null;
+    private DetailViewFragment mDetailViewFragment = null;
+    private Switch mSwitcher = null;
     private DataReceiver mReceiver = null;
     private NotificationManager mNotificationManager = null;
     private boolean isTablet = false;
+    private ArrayList<Object> mSavedMovies = new ArrayList<>();
+
 
 
     @Override
@@ -84,8 +96,44 @@ public class MainActivity extends AppCompatActivity {
         popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
         startService(popularMovieDownloadIntent);
 
-        ListViewFragment listViewFragment = new ListViewFragment();
-        DetailViewFragment detailViewFragment = new DetailViewFragment();
+//        final ListViewFragment listViewFragment = new ListViewFragment();
+//        final DetailViewFragment detailViewFragment = new DetailViewFragment();
+        mListViewFragment = new ListViewFragment();
+        mDetailViewFragment = new DetailViewFragment();
+
+        Toolbar actionBar = (Toolbar) findViewById(R.id.my_action_bar);
+        setSupportActionBar(actionBar);
+
+        if (actionBar != null) {
+            mSwitcher = (Switch) (actionBar.findViewById(R.id.switcher));
+            if(mSwitcher != null) {
+//                if(mListViewFragment != null && mSwitcher.isChecked()) {
+//                    mListViewFragment.showSaveMovies = true;
+//                } else if(mListViewFragment != null) {
+//                    mListViewFragment.showSaveMovies = false;
+//                }
+
+                mSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            if(mListViewFragment != null) {
+                                mListViewFragment.showSaveMovies = true;
+                                mListViewFragment.loadSavedMovies();
+//                                mListViewFragment.setData();
+                            }
+//                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                        } else {
+                            if(mListViewFragment != null) {
+                                mListViewFragment.showSaveMovies = false;
+                                mListViewFragment.setData();
+                            }
+//                            mListViewFragment.setData();
+                        }
+                    }
+                });
+            }
+        }
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
@@ -93,10 +141,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(findViewById(R.id.main_fragment_container) != null) {
-            fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
+            fragmentManager.beginTransaction().add(R.id.main_fragment_container, mListViewFragment).commit();
         }
         if(findViewById(R.id.detail_fragment_container) != null) {
-            fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
+            fragmentManager.beginTransaction().add(R.id.detail_fragment_container, mDetailViewFragment).commit();
         }
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
@@ -150,17 +198,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onMovieClick(int item) {
-        if(item < 0 || item >= Model.getInstance().getMovies().size()) {
+        if(item < 0) {
             return;
         }
+
+        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+
         Intent intent = new Intent(this, DetailViewFragment.class);
         Bundle bundle = new Bundle();
-        if(Model.getInstance().getMovies().get(item) instanceof Movie) {
-            intent.putExtra("Movie", (Movie) Model.getInstance().getMovies().get(item));
+        if(mSwitcher.isChecked()) {
+            intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie)mSavedMovies.get(item));
             bundle = intent.getExtras();
+            bundle.putBoolean(ARG_SHOW_DETAIL, true);
+        } else {
+            if(Model.getInstance().getMovies().get(item) instanceof Movie) {
+                intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie) Model.getInstance().getMovies().get(item));
+                bundle = intent.getExtras();
+                bundle.putBoolean(ARG_SHOW_DETAIL, true);
+            }
         }
-        bundle.putBoolean(ARG_SHOW_DETAIL, true);
-        //bundle.putInt(ARG_MOVIE_ID, item);
 
         DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
         FragmentTransaction transition = fragmentManager.beginTransaction();
@@ -287,4 +343,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public class MovieCallback implements LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
+        Context mContext;
+
+        public MovieCallback(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Loader<ArrayList<Movie>> onCreateLoader(int id, Bundle args) {
+            Log.i(TAG, " onCreateLoader method");
+            switch (id) {
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL");
+                    return new MovieFindAllLoader(mContext);
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
+            Log.i(TAG, " onLoadFinished method");
+            switch (loader.getId()) {
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    mSavedMovies.clear();
+                    mSavedMovies.addAll(data);
+                    if(mListViewFragment != null) {
+                        mListViewFragment.setData();
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ArrayList<Movie>> loader) {
+            Log.i(TAG, " onLoadReset method");
+        }
+    }
 }

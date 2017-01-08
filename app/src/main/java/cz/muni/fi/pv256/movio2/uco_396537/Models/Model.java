@@ -71,7 +71,7 @@ public class Model {
     public void reloadData() {
         if(mContext != null) {
             if(mContext.get() != null) {
-                mContext.get().reloadData();
+                mContext.get().setData();
             }
         }
     }

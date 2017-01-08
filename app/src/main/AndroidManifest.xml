@@ -35,6 +35,11 @@
         <service
             android:name=".Download.DownloadClient"/>
 
+        <provider
+            android:name=".Database.DatabaseProvider"
+            android:authorities="cz.muni.fi.pv256.movio2.uco_396537"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

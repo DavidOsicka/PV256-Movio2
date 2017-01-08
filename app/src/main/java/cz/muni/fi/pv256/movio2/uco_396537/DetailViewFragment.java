@@ -3,7 +3,10 @@ package cz.muni.fi.pv256.movio2.uco_396537;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +14,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
+import cz.muni.fi.pv256.movio2.uco_396537.Database.DatabaseManager;
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieCreateLoader;
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieDeleteLoader;
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
@@ -24,15 +33,19 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 public class DetailViewFragment extends Fragment {
 
     private static final String TAG = DetailViewFragment.class.getName();
-    private static final String ARG_TITLE_YEAR = "title_year";
-    private static final String ARG_DESCRIPTION = "description";
-    private static final String ARG_COVER = "cover";
-    private static final String ARG_BACKDROP = "backdrop";
 
-    private String movieTitleYear = "";
-    private String movieDescription = "";
-    private String coverPicture = "";
-    private String backdropPicture = "";
+    public static final String ARG_MOVIE = "movie";
+    public static final String CURRENT_MOVIE_ID = "id";
+    public static final String CURRENT_MOVIE = "movie";
+    private static final int LOADER_FIND_MOVIE = 1;
+    private static final int LOADER_CREATE_MOVIE = 2;
+    private static final int LOADER_DELETE_MOVIE = 3;
+    private static final int LOADER_FIND_ALL = 4;
+
+    private static DetailViewFragment sInstance = null;
+    private Movie mMovie = null;
+    private DatabaseManager mDatabaseManager = null;
+//    public WeakReference<ListViewFragment> mWeakRef = null;
 
 
     public static DetailViewFragment newInstance(Bundle args){
@@ -41,22 +54,30 @@ public class DetailViewFragment extends Fragment {
         return fragment;
     }
 
+    public static DetailViewFragment getInstace() { // kvuli možnost ziskat view v onReciev
+        return sInstance;
+    }
+
+//    public void setContext(ListViewFragment listViewFragment) {
+//        mWeakRef = new WeakReference<>(listViewFragment);
+//    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, " onAttach method");
+        sInstance = DetailViewFragment.this;
+        mDatabaseManager = new DatabaseManager(getActivity().getApplicationContext());
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, " onCreate method");
+        sInstance = DetailViewFragment.this;
 
         if(savedInstanceState != null) {
-            movieTitleYear = savedInstanceState.getString(ARG_TITLE_YEAR);
-            movieDescription = savedInstanceState.getString(ARG_DESCRIPTION);
-            coverPicture = savedInstanceState.getString(ARG_COVER);
-            backdropPicture = savedInstanceState.getString(ARG_BACKDROP);
+            mMovie = savedInstanceState.getParcelable(ARG_MOVIE);
         }
     }
 
@@ -71,45 +92,63 @@ public class DetailViewFragment extends Fragment {
         TextView descriptionView = (TextView)view.findViewById(R.id.movie_description);
         ImageView coverView = (ImageView)view.findViewById(R.id.image_cover);
         ImageView backdropView = (ImageView)view.findViewById(R.id.image_backdrop);
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
         if(titleView != null) {
-            titleView.setText(movieTitleYear);
+            titleView.setText(mMovie.getTitle() + System.lineSeparator() + mMovie.getReleaseDate()); //+ System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
         }
         if(descriptionView != null) {
-            descriptionView.setText(movieDescription);
+            descriptionView.setText(mMovie.getOverview());
         }
         if(coverView != null) {
-            coverView.setImageBitmap(Model.getInstance().getPicture(coverPicture));
+            coverView.setImageBitmap(Model.getInstance().getPicture(mMovie.getCover()));
         } else {
             coverView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
         }
         if(backdropView != null) {
-            backdropView.setImageBitmap(Model.getInstance().getPicture(backdropPicture));
+            backdropView.setImageBitmap(Model.getInstance().getPicture(mMovie.getBackdrop()));
         } else {
             backdropView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
         }
+        if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
+            fab.setImageResource(android.R.drawable.ic_input_add);
+        } else {
+            fab.setImageResource(android.R.drawable.ic_menu_delete);
+        }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putLong(CURRENT_MOVIE_ID, mMovie.getId());
+                args.putParcelable(CURRENT_MOVIE, mMovie);
+
+                if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
+                    getLoaderManager().initLoader(LOADER_CREATE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+//                    runLoader(LOADER_CREATE_MOVIE);
+                } else {
+                    getLoaderManager().initLoader(LOADER_DELETE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+//                    runLoader(LOADER_DELETE_MOVIE);
+                }
+//                getLoaderManager().initLoader(LOADER_FIND_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+//                getLoaderManager().initLoader(LOADER_FIND_ALL, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+            }
+        });
         return view;
     }
 
     @Override
     public void setArguments(Bundle args) {
-        if(args != null && args.containsKey("Movie")) {
-            Movie movie = args.getParcelable("Movie");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(movie.getReleaseDate());
-            movieTitleYear = movie.getTitle(); // + System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
-            coverPicture = movie.getCoverPath();
-            backdropPicture = movie.getBackdrop();
-            movieDescription = movie.getOverview();
+        if(args != null && args.containsKey(ARG_MOVIE)) {
+            mMovie = args.getParcelable(ARG_MOVIE);
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTimeInMillis(mMovie.getReleaseDate());
         }
     }
 
     @Override
     public void onSaveInstanceState (Bundle outState) {
-        outState.putString(ARG_TITLE_YEAR, movieTitleYear);
-        outState.putString(ARG_DESCRIPTION, movieDescription);
-        outState.putString(ARG_COVER, coverPicture);
-        outState.putString(ARG_BACKDROP, backdropPicture);
+        outState.putParcelable(ARG_MOVIE, mMovie);
         super.onSaveInstanceState(outState);
     }
 
@@ -144,4 +183,97 @@ public class DetailViewFragment extends Fragment {
         Log.d(TAG, " onDestroy method");
     }
 
+
+//    public void runLoader(final int loaderType) {
+//        Bundle args = new Bundle();
+//        if(mMovie != null) {
+//            args.putLong(CURRENT_MOVIE_ID, mMovie.getId());
+//            args.putParcelable(CURRENT_MOVIE, mMovie);
+//        }
+//        getLoaderManager().initLoader(loaderType, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+//    }
+
+
+    public class MovieCallback implements LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
+        Context mContext;
+
+        public MovieCallback(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Loader<ArrayList<Movie>> onCreateLoader(int id, Bundle args) {
+            Log.i(TAG, " onCreateLoader method");
+            switch (id) {
+                case LOADER_FIND_MOVIE:
+                    Log.i(TAG, " LOADER_FIND_MOVIE");
+                    return new MovieFindLoader(mContext, args.getLong(CURRENT_MOVIE_ID, 0));
+                case LOADER_CREATE_MOVIE:
+                    Log.i(TAG, " LOADER_CREATE_MOVIE");
+                    return new MovieCreateLoader(mContext, (Movie) args.getParcelable(CURRENT_MOVIE));
+                case LOADER_DELETE_MOVIE:
+                    Log.i(TAG, " LOADER_DELETE_MOVIE");
+                    return new MovieDeleteLoader(mContext, (Movie) args.getParcelable(CURRENT_MOVIE));
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL");
+                    return new MovieFindAllLoader(mContext);
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
+            Log.i(TAG, " onLoadFinished method");
+            switch (loader.getId()) {
+                case LOADER_FIND_MOVIE:
+                    Log.i(TAG, " LOADER_FIND_MOVIE");
+                    Bundle args = new Bundle();
+                    args.putLong(CURRENT_MOVIE_ID, mMovie.getId());
+                    args.putParcelable(CURRENT_MOVIE, mMovie);
+
+//                    if (data.size() == 0) {
+//                        getLoaderManager().initLoader(LOADER_CREATE_MOVIE, args, MovieCallback.this).forceLoad();
+//                        getLoaderManager().initLoader(LOADER_FIND_ALL, args, MovieCallback.this).forceLoad();
+//                    } else {
+//                        getLoaderManager().initLoader(LOADER_DELETE_MOVIE, args, MovieCallback.this).forceLoad();
+//                        getLoaderManager().initLoader(LOADER_FIND_ALL, args, MovieCallback.this).forceLoad();
+//                    }
+                    break;
+                case LOADER_CREATE_MOVIE:
+                    Log.i(TAG, " LOADER_CREATE_MOVIE");
+                    if (DetailViewFragment.getInstace() != null) {
+                        View view = DetailViewFragment.getInstace().getView();
+                        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+                        fab.setImageResource(android.R.drawable.ic_menu_delete);
+                    }
+                    break;
+                case LOADER_DELETE_MOVIE:
+                    Log.i(TAG, " LOADER_DELETE_MOVIE");
+                    if (DetailViewFragment.getInstace() != null) {
+                        View view = DetailViewFragment.getInstace().getView();
+                        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+                        fab.setImageResource(android.R.drawable.ic_input_add);
+                    }
+                    break;
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+//                    if(mWeakRef != null) {
+//                        if(mWeakRef.get() != null) {
+//                            ArrayList<Object> myData = new ArrayList<>();
+//                            myData.addAll(data);
+//                            mWeakRef.get().setData(myData);
+//                        }
+//                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ArrayList<Movie>> loader) {
+            Log.i(TAG, " onLoadReset method");
+        }
+    }
 }

@@ -45,34 +45,9 @@ public class DownloadClient extends IntentService {
     public void onCreate(){
         super.onCreate();
 
-//        JsonDeserializer<Long> deserializer = new JsonDeserializer<Long>() {
-//            @Override
-//            public Long deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context){
-//                if(json==null){
-//                    return new Long(0);
-//                }
-//                else{
-//                    String dateString = json.getAsString();
-//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//                    long dateLong = 0;
-//                    try {
-//                        Date releaseDate = simpleDateFormat.parse(dateString);
-//                        dateLong = releaseDate.getTime();
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return new Long(dateLong);
-//                }
-//            }
-//        };
-
-//        Gson gson = new GsonBuilder()
-//                .registerTypeAdapter(Long.class, deserializer)
-//                .create();
-
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(/*gson*/))
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
 
@@ -101,8 +76,8 @@ public class DownloadClient extends IntentService {
                         if(movie.getBackdrop() != null) {
                             pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
                         }
-                        if(movie.getCoverPath() != null) {
-                            pictures.put(movie.getCoverPath(), Glide.with(this).load(IMAGE_URL + movie.getCoverPath()).asBitmap().into(200, 200).get());
+                        if(movie.getCover() != null) {
+                            pictures.put(movie.getCover(), Glide.with(this).load(IMAGE_URL + movie.getCover()).asBitmap().into(200, 200).get());
                         }
                     }
                 }
