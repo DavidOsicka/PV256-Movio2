@@ -126,8 +126,13 @@ public class ListViewFragment extends Fragment {
 
     public void setData() {
         if(showSaveMovies) {
-            mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
-            mRecyclerView.setAdapter(mAdapter);
+            if(mSavedMovies.isEmpty()) {
+                mAdapter = new RecyclerViewAdapter("No movies saved in database");
+                mRecyclerView.setAdapter(mAdapter);
+            } else {
+                mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
+                mRecyclerView.setAdapter(mAdapter);
+            }
 //            getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
         } else {
 //            setData(Model.getInstance().getMovies());

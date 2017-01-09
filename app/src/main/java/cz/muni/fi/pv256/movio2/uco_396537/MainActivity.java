@@ -34,6 +34,8 @@ import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Download.DownloadClient;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
+import cz.muni.fi.pv256.movio2.uco_396537.Sync.UpdaterDatabase;
+import cz.muni.fi.pv256.movio2.uco_396537.Sync.UpdaterSyncAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private DataReceiver mReceiver = null;
     private NotificationManager mNotificationManager = null;
     private boolean isTablet = false;
-    private ArrayList<Object> mSavedMovies = new ArrayList<>();
+    public ArrayList<Object> mSavedMovies = new ArrayList<>();
 
 
 
@@ -100,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
 //        final DetailViewFragment detailViewFragment = new DetailViewFragment();
         mListViewFragment = new ListViewFragment();
         mDetailViewFragment = new DetailViewFragment();
+//        mDetailViewFragment.setContext(this);
+
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
+        UpdaterDatabase.getInstance().setMainActivityContext(this);
 
         Toolbar actionBar = (Toolbar) findViewById(R.id.my_action_bar);
         setSupportActionBar(actionBar);
@@ -122,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                                 mListViewFragment.loadSavedMovies();
 //                                mListViewFragment.setData();
                             }
-//                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
                         } else {
                             if(mListViewFragment != null) {
                                 mListViewFragment.showSaveMovies = false;
@@ -134,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
+
+//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
@@ -202,15 +210,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
 
         Intent intent = new Intent(this, DetailViewFragment.class);
         Bundle bundle = new Bundle();
         if(mSwitcher.isChecked()) {
+            if(item > mSavedMovies.size()) {
+                getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                return;
+            }
             intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie)mSavedMovies.get(item));
             bundle = intent.getExtras();
             bundle.putBoolean(ARG_SHOW_DETAIL, true);
         } else {
+            if(item > Model.getInstance().getMovies().size()) {
+                return;
+            }
             if(Model.getInstance().getMovies().get(item) instanceof Movie) {
                 intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie) Model.getInstance().getMovies().get(item));
                 bundle = intent.getExtras();
@@ -245,6 +260,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateSavedMovies(View view) {
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
+        UpdaterSyncAdapter.syncImmediately(MainActivity.this);
+        updatingNotification();
+    }
+
+    public void updatingFinished() {
+        updateFinishedNotification();
+        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+    }
 
     public void changeTheme(View view) {
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
@@ -261,7 +286,33 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void downloadingNotification() {
+    private void updatingNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
+                    .setSmallIcon(android.R.drawable.ic_popup_sync)
+                    .setContentTitle("Movio2 is updating")
+                    .setContentText("Saved movies are being updated")
+                    .setAutoCancel(true);
+
+        mNotificationManager.notify(0, updateNotification.build());
+    }
+
+    private void updateFinishedNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_notify_sync)
+                .setContentTitle("Movio2 finished updating")
+                .setContentText("Saved movies were updated")
+                .setAutoCancel(true);
+
+        mNotificationManager.notify(0, updateNotification.build());
+    }
+
+    private void downloadingNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -275,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
         mNotificationManager.notify(0, downloadingNotification.build());
     }
 
-    public void finishedNotification() {
+    private void downloadingFinishedNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -288,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
         mNotificationManager.notify(0, downloadingNotification.build());
     }
 
-    public void errorNotification() {
+    private void errorNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -333,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
                     Model.getInstance().setPopularMovies(movies);
                     if(mContext != null) {
-                        mContext.get().finishedNotification();
+                        mContext.get().downloadingFinishedNotification();
                     }
                 }
                 Model.getInstance().setPicture(pictures);
