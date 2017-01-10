@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 
 /**
  * Created by david on 10.10.16.
@@ -24,15 +24,14 @@ public class ListViewFragment extends Fragment {
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
 
-    private WeakReference<Context> mContextWeakReference;
-
-    private String[] dataset = {"movie 1", "movie 2", "movie 3"};
+    private Context mContext = null;
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, " onAttach  method");
+        mContext = getActivity();
     }
 
     @Override
@@ -50,28 +49,18 @@ public class ListViewFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
-        // use this setting to improve performance if you know that changes in content do not change the layout size of the RecyclerView
         if(mRecyclerView != null) {
+            // this setting improves performance if you know that changes in content do not change the layout size of the RecyclerView
             mRecyclerView.setHasFixedSize(true);
-
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
         }
 
-        // specify an adapter (see also next example)
-        if(mContextWeakReference != null) {
-            mAdapter = new RecyclerViewAdapter(dataset, mContextWeakReference.get());
-            mRecyclerView.setAdapter(mAdapter);
-        }
+        Model.getInstance().setContext(this);
+        reloadData();
 
         return view;
-    }
-
-    public void setAppContext(Context context) {
-        if(context != null) {
-            mContextWeakReference = new WeakReference<Context>(context);
-        }
     }
 
     @Override
@@ -103,5 +92,15 @@ public class ListViewFragment extends Fragment {
         super.onDestroy();
         // The activity is about to be destroyed.
         Log.d(TAG, " onDestroy method");
+    }
+
+    public void reloadData() {
+        if(Model.getInstance().getMovies().isEmpty()) {
+            mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+            mRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 }

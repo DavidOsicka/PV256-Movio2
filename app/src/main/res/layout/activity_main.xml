@@ -15,6 +15,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     -->
 
+    <!--
     <Button
         android:text="change style"
         android:layout_width="wrap_content"
@@ -23,13 +24,12 @@
         android:onClick="changeTheme"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
+    -->
 
     <FrameLayout
         android:id="@+id/main_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
-
-    </FrameLayout>
+        />
 
 </RelativeLayout>

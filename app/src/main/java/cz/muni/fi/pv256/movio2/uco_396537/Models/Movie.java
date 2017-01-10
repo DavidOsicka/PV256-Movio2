@@ -1,7 +1,9 @@
-package cz.muni.fi.pv256.movio2.uco_396537;
+package cz.muni.fi.pv256.movio2.uco_396537.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by david on 23.10.16.
@@ -11,7 +13,9 @@ public class Movie implements Parcelable {
 
     private String title;
     private long releaseDate;
+    @SerializedName("poster_path")
     private String coverPath;
+    @SerializedName("backdrop_path")
     private String backdrop;
     private float popularity;
 

@@ -9,24 +9,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = MainActivity.class.getName();
-
-    //public static final String ARG_MOVIE_ID = "movie_id";
-    public static final String ARG_SHOW_DETAIL = "show_detail";
-
+    private static final String ARG_SHOW_DETAIL = "show_detail";
     private static final String PREFERENCES_NAME = "pref";
     private static final String THEME_NAME = "theme";
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
 
     private boolean isTablet = false;
-    private ArrayList<Movie> mMovies = new ArrayList<Movie>();
 
 
 
@@ -51,9 +51,6 @@ public class MainActivity extends AppCompatActivity {
         isTablet = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
 
-        mMovies.add(new Movie("Film 1", 1991, "", "", 0.0f));
-        mMovies.add(new Movie("Film 2", 1992, "", "", 0.0f));
-        mMovies.add(new Movie("Film 3", 1993, "", "", 0.0f));
 
         if(isTablet) {
             //code for big screen (like tablet)
@@ -65,21 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         ListViewFragment listViewFragment = new ListViewFragment();
         DetailViewFragment detailViewFragment = new DetailViewFragment();
-        listViewFragment.setAppContext(this);
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
-//            if(isTablet) {
-//
-//            } else {
-//                boolean showDetail = savedInstanceState.getBoolean(ARG_SHOW_DETAIL, false);
-//                if(showDetail) {
-//                    detailViewFragment.setArguments(savedInstanceState);
-//                    fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
-//                } else {
-//                    fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
-//                }
-//            }
             return;
         }
 
@@ -89,16 +74,66 @@ public class MainActivity extends AppCompatActivity {
         if(findViewById(R.id.detail_fragment_container) != null) {
             fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
         }
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
     }
 
-//    @Override
-//    protected void onSaveInstanceState (Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//
-//        if(fragmentManager.findFragmentById(R.id.detail_view_fragment) != null) {
-//            outState.putBoolean(ARG_SHOW_DETAIL, true);
-//        }
-//    }
+
+    public void onMovieClick(int item) {
+        if(item < 0 || item >= Model.getInstance().getMovies().size()) {
+            return;
+        }
+        Intent intent = new Intent(this, DetailViewFragment.class);
+        Bundle bundle = new Bundle();
+        if(Model.getInstance().getMovies().get(item) instanceof Movie) {
+            intent.putExtra("Movie", (Movie) Model.getInstance().getMovies().get(item));
+            bundle = intent.getExtras();
+        }
+        bundle.putBoolean(ARG_SHOW_DETAIL, true);
+        //bundle.putInt(ARG_MOVIE_ID, item);
+
+        DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
+        FragmentTransaction transition = fragmentManager.beginTransaction();
+
+        if(isTablet) {
+            //code for big screen (like tablet)
+            if(findViewById(R.id.detail_fragment_container) != null) {
+                transition.replace(R.id.detail_fragment_container, detailViewFragment);
+            }
+        }else{
+            //code for small screen (like smartphone)
+            if(findViewById(R.id.main_fragment_container) != null) {
+                transition.replace(R.id.main_fragment_container, detailViewFragment);
+            }
+        }
+        transition.addToBackStack("detail_fragment");
+        transition.commit();
+    }
+
+    public void onMovieLongClick(int item) {
+        if(item < 0 || item >= Model.getInstance().getMovies().size()) {
+            return;
+        }
+        if(Model.getInstance().getMovies().get(item) instanceof Movie) {
+            Toast.makeText(this, ((Movie) Model.getInstance().getMovies().get(item)).getTitle(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void changeTheme(View view) {
+        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
+        SharedPreferences.Editor editor = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit();
+
+        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
+            editor.putString(THEME_NAME, "AppTheme2");
+        } else {
+            editor.putString(THEME_NAME, "AppTheme1");
+        }
+        editor.apply();
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
 
     @Override
     protected void onStart() {
@@ -130,65 +165,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         // The activity is about to be destroyed.
         Log.d(TAG, " onDestroy method");
-    }
-
-    public void onMovieItemSelected(int item) {
-        if(item < 0 || item > mMovies.size()) {
-            return;
-        }
-        Intent intent = new Intent(this, DetailViewFragment.class);
-        intent.putExtra("Movie", mMovies.get(item));
-        Bundle bundle = intent.getExtras();
-        bundle.putBoolean(ARG_SHOW_DETAIL, true);
-        //bundle.putInt(ARG_MOVIE_ID, item);
-
-        DetailViewFragment detailViewFragment = DetailViewFragment.newInstance(bundle);
-        FragmentTransaction transition = fragmentManager.beginTransaction();
-
-        if(isTablet) {
-            //code for big screen (like tablet)
-            if(findViewById(R.id.detail_fragment_container) != null) {
-                transition.replace(R.id.detail_fragment_container, detailViewFragment);
-            }
-        }else{
-            //code for small screen (like smartphone)
-            if(findViewById(R.id.main_fragment_container) != null) {
-                transition.replace(R.id.main_fragment_container, detailViewFragment);
-            }
-        }
-        transition.addToBackStack("detail_fragment");
-        transition.commit();
-    }
-
-
-    public void backToList(View view) {
-        if(isTablet) {
-            //code for big screen (like tablet)
-        }else{
-            //code for small screen (like smartphone)
-            if(findViewById(R.id.main_fragment_container) != null) {
-                fragmentManager.popBackStack("detail_fragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                //fragmentManager.beginTransaction().replace(R.id.main_fragment_container, listViewFragment).commit();
-            }
-        }
-    }
-
-
-    public void changeTheme(View view) {
-        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
-        SharedPreferences.Editor editor = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit();
-
-        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
-            editor.putString(THEME_NAME, "AppTheme2");
-        } else {
-            editor.putString(THEME_NAME, "AppTheme1");
-        }
-
-        editor.apply();
-
-        Intent intent = getIntent();
-        finish();
-
-        startActivity(intent);
     }
 }
