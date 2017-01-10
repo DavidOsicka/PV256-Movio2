@@ -30,7 +30,9 @@ public class DownloadClient extends IntentService {
 
     private static final String BASE_URL = "https://api.themoviedb.org/";
     private static final String API_KEY = "32bde8b225e94c4cbc6cacbe47c99cf1";
-    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/original";
+    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/";
+    private static final String IMAGE_LOW_RESOLUTION = "w300";
+    private static final String IMAGE_HIGH_RESOLUTION = "w500";
     private static final String POPULAR_MOVIES_URL = "popularity.desc";
     private static final String NEW_MOVIES_URL = DateTime.now().minusDays(7).toString("YYYY-MM-dd");
 
@@ -74,10 +76,10 @@ public class DownloadClient extends IntentService {
                 if (!movies.isEmpty()) {
                     for (Movie movie : movies) {
                         if(movie.getBackdrop() != null) {
-                            pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + movie.getBackdrop()).asBitmap().into(200, 200).get());
+                            pictures.put(movie.getBackdrop(), Glide.with(this).load(IMAGE_URL + IMAGE_HIGH_RESOLUTION    + movie.getBackdrop()).asBitmap().into(200, 200).get());
                         }
                         if(movie.getCover() != null) {
-                            pictures.put(movie.getCover(), Glide.with(this).load(IMAGE_URL + movie.getCover()).asBitmap().into(200, 200).get());
+                            pictures.put(movie.getCover(), Glide.with(this).load(IMAGE_URL + IMAGE_LOW_RESOLUTION + movie.getCover()).asBitmap().into(200, 200).get());
                         }
                     }
                 }

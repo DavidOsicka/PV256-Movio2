@@ -94,46 +94,49 @@ public class DetailViewFragment extends Fragment {
         ImageView backdropView = (ImageView)view.findViewById(R.id.image_backdrop);
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
-        if(titleView != null) {
-            titleView.setText(mMovie.getTitle() + System.lineSeparator() + mMovie.getReleaseDate()); //+ System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
-        }
-        if(descriptionView != null) {
-            descriptionView.setText(mMovie.getOverview());
-        }
-        if(coverView != null) {
-            coverView.setImageBitmap(Model.getInstance().getPicture(mMovie.getCover()));
-        } else {
-            coverView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
-        }
-        if(backdropView != null) {
-            backdropView.setImageBitmap(Model.getInstance().getPicture(mMovie.getBackdrop()));
-        } else {
-            backdropView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
-        }
-        if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
-            fab.setImageResource(android.R.drawable.ic_input_add);
-        } else {
-            fab.setImageResource(android.R.drawable.ic_menu_delete);
-        }
+        if(mMovie != null) {
+            if(titleView != null) {
+                titleView.setText(mMovie.getTitle() + System.lineSeparator() + mMovie.getReleaseDate()); //+ System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
+            }
+            if(descriptionView != null) {
+                descriptionView.setText(mMovie.getOverview());
+            }
+            if(coverView != null) {
+                coverView.setImageBitmap(Model.getInstance().getPicture(mMovie.getCover()));
+            } else {
+                coverView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
+            }
+            if(backdropView != null) {
+                backdropView.setImageBitmap(Model.getInstance().getPicture(mMovie.getBackdrop()));
+            } else {
+                backdropView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
+            }
+            if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
+                fab.setImageResource(android.R.drawable.ic_input_add);
+            } else {
+                fab.setImageResource(android.R.drawable.ic_menu_delete);
+            }
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle args = new Bundle();
-                args.putLong(CURRENT_MOVIE_ID, mMovie.getId());
-                args.putParcelable(CURRENT_MOVIE, mMovie);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bundle args = new Bundle();
+                    args.putLong(CURRENT_MOVIE_ID, mMovie.getId());
+                    args.putParcelable(CURRENT_MOVIE, mMovie);
 
-                if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
-                    getLoaderManager().initLoader(LOADER_CREATE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+                    if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
+                        getLoaderManager().initLoader(LOADER_CREATE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
 //                    runLoader(LOADER_CREATE_MOVIE);
-                } else {
-                    getLoaderManager().initLoader(LOADER_DELETE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+                    } else {
+                        getLoaderManager().initLoader(LOADER_DELETE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
 //                    runLoader(LOADER_DELETE_MOVIE);
-                }
+                    }
 //                getLoaderManager().initLoader(LOADER_FIND_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
 //                getLoaderManager().initLoader(LOADER_FIND_ALL, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
-            }
-        });
+                }
+            });
+        }
+
         return view;
     }
 
@@ -141,8 +144,6 @@ public class DetailViewFragment extends Fragment {
     public void setArguments(Bundle args) {
         if(args != null && args.containsKey(ARG_MOVIE)) {
             mMovie = args.getParcelable(ARG_MOVIE);
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTimeInMillis(mMovie.getReleaseDate());
         }
     }
 

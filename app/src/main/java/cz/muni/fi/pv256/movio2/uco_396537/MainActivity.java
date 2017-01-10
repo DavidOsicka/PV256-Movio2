@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,14 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int LOADER_FIND_ALL = 4;
 
     private final FragmentManager fragmentManager = getSupportFragmentManager();
-    private ListViewFragment mListViewFragment = null;
-    private DetailViewFragment mDetailViewFragment = null;
     private Switch mSwitcher = null;
     private DataReceiver mReceiver = null;
     private NotificationManager mNotificationManager = null;
-    private boolean isTablet = false;
     private ArrayList<Object> mSavedMovies = new ArrayList<>();
-
+    private ListViewFragment mListViewFragment = null;
+    private DetailViewFragment mDetailViewFragment = null;
+    private boolean isTablet = false;
 
 
     @Override
@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
         }
 
+        mListViewFragment = new ListViewFragment();
+        mDetailViewFragment = new DetailViewFragment();
+
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         downloadingNotification();
 
@@ -95,11 +98,6 @@ public class MainActivity extends AppCompatActivity {
         Intent popularMovieDownloadIntent = new Intent(this, DownloadClient.class);
         popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
         startService(popularMovieDownloadIntent);
-
-//        final ListViewFragment listViewFragment = new ListViewFragment();
-//        final DetailViewFragment detailViewFragment = new DetailViewFragment();
-        mListViewFragment = new ListViewFragment();
-        mDetailViewFragment = new DetailViewFragment();
 
         Toolbar actionBar = (Toolbar) findViewById(R.id.my_action_bar);
         setSupportActionBar(actionBar);
@@ -118,15 +116,15 @@ public class MainActivity extends AppCompatActivity {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
                             if(mListViewFragment != null) {
-                                mListViewFragment.showSaveMovies = true;
+                                mListViewFragment.setShowSavedMovies(true);
                                 mListViewFragment.loadSavedMovies();
 //                                mListViewFragment.setData();
                             }
-//                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
                         } else {
                             if(mListViewFragment != null) {
-                                mListViewFragment.showSaveMovies = false;
-                                mListViewFragment.setData();
+                                mListViewFragment.setShowSavedMovies(false);
+                                mListViewFragment.reloadData();
                             }
 //                            mListViewFragment.setData();
                         }
@@ -196,21 +194,27 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onDestroy method");
     }
 
-
     public void onMovieClick(int item) {
         if(item < 0) {
             return;
         }
 
-        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
 
         Intent intent = new Intent(this, DetailViewFragment.class);
         Bundle bundle = new Bundle();
         if(mSwitcher.isChecked()) {
+            if(item > mSavedMovies.size()) {
+                getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                return;
+            }
             intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie)mSavedMovies.get(item));
             bundle = intent.getExtras();
             bundle.putBoolean(ARG_SHOW_DETAIL, true);
         } else {
+            if(item > Model.getInstance().getMovies().size()) {
+                return;
+            }
             if(Model.getInstance().getMovies().get(item) instanceof Movie) {
                 intent.putExtra(DetailViewFragment.ARG_MOVIE, (Movie) Model.getInstance().getMovies().get(item));
                 bundle = intent.getExtras();
@@ -273,6 +277,10 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         mNotificationManager.notify(0, downloadingNotification.build());
+
+        if(mListViewFragment != null) {
+            mListViewFragment.setDownloading(true);
+        }
     }
 
     public void finishedNotification() {
@@ -286,6 +294,10 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         mNotificationManager.notify(0, downloadingNotification.build());
+
+        if(mListViewFragment != null) {
+            mListViewFragment.setDownloading(false);
+        }
     }
 
     public void errorNotification() {
@@ -371,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                     mSavedMovies.clear();
                     mSavedMovies.addAll(data);
                     if(mListViewFragment != null) {
-                        mListViewFragment.setData();
+                        mListViewFragment.reloadData();
                     }
                     break;
                 default:

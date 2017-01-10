@@ -11,9 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import java.util.ArrayList;
-
 import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
@@ -33,8 +31,10 @@ public class ListViewFragment extends Fragment {
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
     private Context mContext = null;
-    public boolean showSaveMovies = false;
     private ArrayList<Object> mSavedMovies = new ArrayList<>();
+    private boolean mDownloading = false;
+    private boolean mShowSavedMovies = false;
+
 
     @Override
     public void onAttach(Context context) {
@@ -49,7 +49,7 @@ public class ListViewFragment extends Fragment {
         Log.d(TAG, " onCreate  method");
 
         if(savedInstanceState != null) {
-            showSaveMovies = savedInstanceState.getBoolean(ARG_SHOW_SAVED);
+            mShowSavedMovies = savedInstanceState.getBoolean(ARG_SHOW_SAVED);
         }
     }
 
@@ -71,12 +71,12 @@ public class ListViewFragment extends Fragment {
         }
 
         Model.getInstance().setContext(this);
-        if(showSaveMovies) {
+        if(mShowSavedMovies) {
                 loadSavedMovies();
 //            setData();
 //            getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
         } else {
-            setData();
+            reloadData();
 //            setData(Model.getInstance().getMovies());
         }
 
@@ -116,7 +116,7 @@ public class ListViewFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState (Bundle outState) {
-        outState.putBoolean(ARG_SHOW_SAVED, showSaveMovies);
+        outState.putBoolean(ARG_SHOW_SAVED, mShowSavedMovies);
         super.onSaveInstanceState(outState);
     }
 
@@ -124,13 +124,32 @@ public class ListViewFragment extends Fragment {
         getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
     }
 
-    public void setData() {
-        if(showSaveMovies) {
-            mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
+    public void setDownloading(boolean downloading) {
+        mDownloading = downloading;
+        reloadData();
+    }
+
+    public void setShowSavedMovies(boolean showSavedMovies) {
+        mShowSavedMovies = showSavedMovies;
+        reloadData();
+    }
+
+    public void reloadData() {
+        if(mRecyclerView == null) {
+            return;
+        }
+        if(mDownloading) {
+            mAdapter = new RecyclerViewAdapter("Downloading data");
             mRecyclerView.setAdapter(mAdapter);
-//            getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+        } else if(mShowSavedMovies) {
+            if(mSavedMovies.isEmpty()) {
+                mAdapter = new RecyclerViewAdapter("No movies saved in database");
+                mRecyclerView.setAdapter(mAdapter);
+            } else {
+                mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
+                mRecyclerView.setAdapter(mAdapter);
+            }
         } else {
-//            setData(Model.getInstance().getMovies());
             if(Model.getInstance().getMovies().isEmpty()) {
                 mAdapter = new RecyclerViewAdapter("Sorry, no data available");
                 mRecyclerView.setAdapter(mAdapter);
@@ -169,7 +188,7 @@ public class ListViewFragment extends Fragment {
                     Log.i(TAG, " LOADER_FIND_ALL " + data.size());
                     mSavedMovies.clear();
                     mSavedMovies.addAll(data);
-                    setData();
+                    reloadData();
 //                    ArrayList<Object> myData = new ArrayList<>();
 //                    myData.addAll(data);
 //                    setData(myData);

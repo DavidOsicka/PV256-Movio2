@@ -17,8 +17,8 @@
             android:id="@+id/image_backdrop"
             android:layout_width="match_parent"
             android:scaleType="centerCrop"
-            android:layout_height="150dp"
-            app:srcCompat="@android:color/transparent"/>
+            app:srcCompat="@android:color/transparent"
+            android:layout_height="250dp" />
 
         <!--Headline-->
         <TextView
@@ -49,17 +49,6 @@
 
     </LinearLayout>
 
-    <!--cover picture-->
-    <ImageView
-        android:id="@+id/image_cover"
-        android:layout_width="110dp"
-        android:layout_height="130dp"
-        android:adjustViewBounds="true"
-        android:background="@android:color/transparent"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="100dp"
-        android:layout_gravity="top|left"/>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -70,5 +59,16 @@
         android:background="@color/primary_text_material_light"
         app:layout_anchor="@id/image_backdrop"
         app:layout_anchorGravity="bottom|right|end"/>
+
+    <!--cover picture-->
+    <ImageView
+        android:id="@+id/image_cover"
+        android:layout_width="110dp"
+        android:layout_height="130dp"
+        android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="200dp"
+        android:layout_gravity="top|left"/>
 
 </android.support.design.widget.CoordinatorLayout>
