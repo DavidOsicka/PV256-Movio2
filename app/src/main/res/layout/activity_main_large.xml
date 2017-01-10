@@ -52,15 +52,13 @@
 
         <FrameLayout
             android:id="@+id/main_fragment_container"
-            android:layout_width="100dp"
             android:layout_height="match_parent"
-            />
+            android:layout_width="400dp" />
 
         <FrameLayout
             android:id="@+id/detail_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="100dp"
             />
 
     </LinearLayout>
