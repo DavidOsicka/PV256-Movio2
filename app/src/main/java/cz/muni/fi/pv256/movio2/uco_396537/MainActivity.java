@@ -40,7 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private final FragmentManager fragmentManager = getSupportFragmentManager();
     private DataReceiver mReceiver = null;
     private NotificationManager mNotificationManager = null;
+    private ListViewFragment mListViewFragment = null;
+    private DetailViewFragment mDetailViewFragment = null;
     private boolean isTablet = false;
+//    public boolean downloading = false;
 
 
     @Override
@@ -73,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
         }
 
+        mListViewFragment = new ListViewFragment();
+        mDetailViewFragment = new DetailViewFragment();
+
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         downloadingNotification();
 
@@ -84,19 +90,16 @@ public class MainActivity extends AppCompatActivity {
         popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
         startService(popularMovieDownloadIntent);
 
-        ListViewFragment listViewFragment = new ListViewFragment();
-        DetailViewFragment detailViewFragment = new DetailViewFragment();
-
         // we're being restored from a previous state
         if (savedInstanceState != null) {
             return;
         }
 
         if(findViewById(R.id.main_fragment_container) != null) {
-            fragmentManager.beginTransaction().add(R.id.main_fragment_container, listViewFragment).commit();
+            fragmentManager.beginTransaction().add(R.id.main_fragment_container, mListViewFragment).commit();
         }
         if(findViewById(R.id.detail_fragment_container) != null) {
-            fragmentManager.beginTransaction().add(R.id.detail_fragment_container, detailViewFragment).commit();
+            fragmentManager.beginTransaction().add(R.id.detail_fragment_container, mDetailViewFragment).commit();
         }
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
@@ -217,6 +220,10 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         mNotificationManager.notify(0, downloadingNotification.build());
+        if(mListViewFragment != null) {
+            mListViewFragment.setDownloading(true);
+        }
+//        downloading = true;
     }
 
     public void finishedNotification() {
@@ -230,6 +237,10 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         mNotificationManager.notify(0, downloadingNotification.build());
+        if(mListViewFragment != null) {
+            mListViewFragment.setDownloading(false);
+        }
+//        downloading = false;
     }
 
     public void errorNotification() {

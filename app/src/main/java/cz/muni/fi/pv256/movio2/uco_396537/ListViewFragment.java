@@ -23,8 +23,8 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView = null;
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
-
     private Context mContext = null;
+    private boolean mDownloading = false;
 
 
     @Override
@@ -94,8 +94,19 @@ public class ListViewFragment extends Fragment {
         Log.d(TAG, " onDestroy method");
     }
 
+    public void setDownloading(boolean downloading) {
+        mDownloading = downloading;
+        reloadData();
+    }
+
     public void reloadData() {
-        if(Model.getInstance().getMovies().isEmpty()) {
+        if(mRecyclerView == null) {
+            return;
+        }
+        if(mDownloading) {
+            mAdapter = new RecyclerViewAdapter("Downloading data");
+            mRecyclerView.setAdapter(mAdapter);
+        } else if(Model.getInstance().getMovies().isEmpty()) {
             mAdapter = new RecyclerViewAdapter("Sorry, no data available");
             mRecyclerView.setAdapter(mAdapter);
         } else {
