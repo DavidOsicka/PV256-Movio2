@@ -2,7 +2,6 @@ package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,7 +62,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        Log.d(TAG, "onCreateViewHolder method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onCreateViewHolder method");
+        }
+
         LayoutInflater inflater =  LayoutInflater.from(parent.getContext());
         View view;
         switch(viewType) {
@@ -84,7 +86,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // get element from dataset at this position and replace the contents of the view with that element
-        Log.d(TAG, "onBindViewHolder method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onBindViewHolder method");
+        }
+
         if(holder == null || position < 0 || position > mItems.size()) {
             return;
         }

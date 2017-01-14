@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
+import cz.muni.fi.pv256.movio2.uco_396537.R;
 
 
 /**
@@ -40,13 +41,21 @@ public class Model {
 
     public void setNewMovies(ArrayList<Movie> movies) {
         mNewMovies.clear();
-        mNewMovies.add(new String("NEW MOVIES"));
+        if(mContext != null) {
+            mNewMovies.add(mContext.get().getResources().getString(R.string.category_new_movies));
+        } else {
+            mNewMovies.add(new String("NEW MOVIES"));
+        }
         mNewMovies.addAll(movies);
     }
 
     public void setPopularMovies(ArrayList<Movie> movies) {
         mPopularMovies.clear();
-        mPopularMovies.add(new String("POPULAR MOVIES"));
+        if(mContext != null) {
+            mNewMovies.add(mContext.get().getResources().getString(R.string.category_popular_movies));
+        } else {
+            mPopularMovies.add(new String("POPULAR MOVIES"));
+        }
         mPopularMovies.addAll(movies);
     }
 

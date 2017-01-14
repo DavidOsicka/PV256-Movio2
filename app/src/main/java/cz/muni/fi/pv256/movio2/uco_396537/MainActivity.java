@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -61,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // The activity is being created.
-        Log.d(TAG, " onCreate method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onCreate method");
+        }
 
         // This starts a class with strict mode
         App app = new App();
@@ -110,11 +111,6 @@ public class MainActivity extends AppCompatActivity {
         if (actionBar != null) {
             mSwitcher = (Switch) (actionBar.findViewById(R.id.switcher));
             if(mSwitcher != null) {
-//                if(mListViewFragment != null && mSwitcher.isChecked()) {
-//                    mListViewFragment.showSaveMovies = true;
-//                } else if(mListViewFragment != null) {
-//                    mListViewFragment.showSaveMovies = false;
-//                }
 
                 mSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -123,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
                             if(mListViewFragment != null) {
                                 mListViewFragment.setShowSavedMovies(true);
                                 mListViewFragment.loadSavedMovies();
-//                                mListViewFragment.setData();
                             }
                             getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
                         } else {
@@ -131,14 +126,11 @@ public class MainActivity extends AppCompatActivity {
                                 mListViewFragment.setShowSavedMovies(false);
                                 mListViewFragment.reloadData();
                             }
-//                            mListViewFragment.setData();
                         }
                     }
                 });
             }
         }
-
-//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
@@ -160,7 +152,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // The activity is about to become visible.
-        Log.d(TAG, " onStart method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onStart method");
+        }
 
         mReceiver = new DataReceiver();
         mReceiver.setContext(this);
@@ -173,21 +167,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // The activity has become visible (it is now "resumed").
-        Log.d(TAG, " onResume method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onResume method");
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
-        Log.d(TAG, " onPause method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onPause method");
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
-        Log.d(TAG, " onStop method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onStop method");
+        }
 
         if(mReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
@@ -198,7 +198,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // The activity is about to be destroyed.
-        Log.d(TAG, " onDestroy method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onDestroy method");
+        }
     }
 
     public void onMovieClick(int item) {
@@ -288,8 +290,8 @@ public class MainActivity extends AppCompatActivity {
         }
         NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
                     .setSmallIcon(android.R.drawable.ic_popup_sync)
-                    .setContentTitle("Movio2 is updating")
-                    .setContentText("Saved movies are being updated")
+                    .setContentTitle(getResources().getString(R.string.updating_notif_title))
+                    .setContentText(getResources().getString(R.string.updating_notif_text))
                     .setAutoCancel(true);
 
         mNotificationManager.notify(0, updateNotification.build());
@@ -301,8 +303,8 @@ public class MainActivity extends AppCompatActivity {
         }
         NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_notify_sync)
-                .setContentTitle("Movio2 finished updating")
-                .setContentText("Saved movies were updated")
+                .setContentTitle(getResources().getString(R.string.updating_finished_notif_title))
+                .setContentText(getResources().getString(R.string.updating_finished_notif_text))
                 .setAutoCancel(true);
 
         mNotificationManager.notify(0, updateNotification.build());
@@ -313,8 +315,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
-                .setContentTitle("Downloading")
-                .setContentText("Movio2 downloading data")
+                .setContentTitle(getResources().getString(R.string.downloading_notif_title))
+                .setContentText(getResources().getString(R.string.downloading_notif_text))
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setProgress(0, 0, true)
                 .setAutoCancel(true);
@@ -331,8 +333,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
-                .setContentTitle("Downloading finished")
-                .setContentText("Movio2 finished downloading of data")
+                .setContentTitle(getResources().getString(R.string.downloading_finished_notif_title))
+                .setContentText(getResources().getString(R.string.downloading_finished_notif_text))
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setAutoCancel(true);
 
@@ -348,8 +350,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         NotificationCompat.Builder downloadingNotification = new NotificationCompat.Builder(this)
-                .setContentTitle("ERROR")
-                .setContentText("Movio2 can not download data")
+                .setContentTitle(getResources().getString(R.string.error_notif_title))
+                .setContentText(getResources().getString(R.string.error_notif_text))
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setAutoCancel(true);
 
@@ -407,10 +409,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Loader<ArrayList<Movie>> onCreateLoader(int id, Bundle args) {
-            Log.i(TAG, " onCreateLoader method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onCreateLoader method");
+            }
             switch (id) {
                 case LOADER_FIND_ALL:
-                    Log.i(TAG, " LOADER_FIND_ALL");
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, " LOADER_FIND_ALL");
+                    }
                     return new MovieFindAllLoader(mContext);
                 default:
                     throw new UnsupportedOperationException("Not know loader id");
@@ -419,10 +425,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLoadFinished(Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
-            Log.i(TAG, " onLoadFinished method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onLoadFinished method");
+            }
             switch (loader.getId()) {
                 case LOADER_FIND_ALL:
-                    Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    }
                     mSavedMovies.clear();
                     mSavedMovies.addAll(data);
                     if(mListViewFragment != null) {
@@ -436,7 +446,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLoaderReset(Loader<ArrayList<Movie>> loader) {
-            Log.i(TAG, " onLoadReset method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onLoadReset method");
+            }
         }
     }
 }

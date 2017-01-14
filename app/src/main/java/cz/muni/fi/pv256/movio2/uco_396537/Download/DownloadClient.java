@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import cz.muni.fi.pv256.movio2.uco_396537.MainActivity;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
+import cz.muni.fi.pv256.movio2.uco_396537.R;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -29,7 +30,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DownloadClient extends IntentService {
 
     private static final String BASE_URL = "https://api.themoviedb.org/";
-    private static final String API_KEY = "32bde8b225e94c4cbc6cacbe47c99cf1";
     private static final String IMAGE_URL = "https://image.tmdb.org/t/p/";
     private static final String IMAGE_LOW_RESOLUTION = "w300";
     private static final String IMAGE_HIGH_RESOLUTION = "w500";
@@ -63,9 +63,9 @@ public class DownloadClient extends IntentService {
         Call<MovieListJson> moviesCall = null;
 
         if(movieType == Model.NEW_MOVIE_TYPE) {
-            moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
+            moviesCall = downloadService.downloadNewMovies(getResources().getString(R.string.api_key), NEW_MOVIES_URL);
         } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
-            moviesCall = downloadService.downloadPopularMovies(API_KEY, POPULAR_MOVIES_URL);
+            moviesCall = downloadService.downloadPopularMovies(getResources().getString(R.string.api_key), POPULAR_MOVIES_URL);
         }
 
         try {

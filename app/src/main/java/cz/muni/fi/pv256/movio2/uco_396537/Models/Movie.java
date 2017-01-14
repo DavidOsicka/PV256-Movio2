@@ -14,13 +14,11 @@ public class Movie implements Parcelable {
     private long id;
     private String title;
     @SerializedName("release_date")
-//    private long releaseDate;
     private String releaseDate;
     @SerializedName("poster_path")
     private String cover;
     @SerializedName("backdrop_path")
     private String backdrop;
-    //@SerializedName("vote_average") // nevim jestli má zobrazovat popularity nebo vore avarege, v zadání bylo popularity
     private float popularity;
     private String overview;
 
@@ -29,7 +27,6 @@ public class Movie implements Parcelable {
     public Movie(Parcel parcel) {
         id = parcel.readLong();
         title = parcel.readString();
-//        releaseDate = parcel.readLong();
         releaseDate = parcel.readString();
         cover = parcel.readString();
         backdrop = parcel.readString();
@@ -40,7 +37,6 @@ public class Movie implements Parcelable {
     public Movie(long id, String title, String releaseDate, String cover, String backdrop, float popularity, String overview) {
         this.id = id;
         this.title = title;
-//        this.releaseDate = releaseDate;
         this.releaseDate = releaseDate;
         this.cover = cover;
         this.backdrop = backdrop;
@@ -57,7 +53,6 @@ public class Movie implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(id);
         parcel.writeString(title);
-//        parcel.writeLong(releaseDate);
         parcel.writeString(releaseDate);
         parcel.writeString(cover);
         parcel.writeString(backdrop);
@@ -81,7 +76,6 @@ public class Movie implements Parcelable {
 
         result = prime * result + (int)id;
         result = prime * result + (title == null ? 0 : title.hashCode());
-//        result = prime * result + (int)releaseDate;
         result = prime * result + (title == null ? 0 : title.hashCode());
         result = prime * result + (releaseDate == null ? 0 : releaseDate.hashCode());
         result = prime * result + (cover == null ? 0 : cover.hashCode());
@@ -101,9 +95,6 @@ public class Movie implements Parcelable {
     public void setTitle(String title) {
         this.title = title;
     }
-
-//    public long getReleaseDate() { return releaseDate; }
-//    public void setReleaseDate(long releaseDate) { this.releaseDate = releaseDate; }
 
     public String getReleaseDate() { return releaseDate; }
     public void setReleaseDate(String releaseDate) {
