@@ -63,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
         // The activity is being created.
         Log.d(TAG, " onCreate method");
 
-        // This starts a class with strict mode
-        App app = new App();
-        app.onCreate();
-
         // This is used to reload theme from preferences when swithing themes
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
         if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
@@ -94,51 +90,14 @@ public class MainActivity extends AppCompatActivity {
         downloadingNotification();
 
         Intent newMovieDownloadIntent = new Intent(this, DownloadClient.class);
-        newMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.NEW_MOVIE_TYPE);
         startService(newMovieDownloadIntent);
-
-        Intent popularMovieDownloadIntent = new Intent(this, DownloadClient.class);
-        popularMovieDownloadIntent.putExtra(Model.MOVIE_TYPE, Model.POPULAR_MOVIE_TYPE);
-        startService(popularMovieDownloadIntent);
 
         UpdaterSyncAdapter.initializeSyncAdapter(this);
         UpdaterDatabase.getInstance().setMainActivityContext(this);
 
         Toolbar actionBar = (Toolbar) findViewById(R.id.my_action_bar);
         setSupportActionBar(actionBar);
-
-        if (actionBar != null) {
-            mSwitcher = (Switch) (actionBar.findViewById(R.id.switcher));
-            if(mSwitcher != null) {
-//                if(mListViewFragment != null && mSwitcher.isChecked()) {
-//                    mListViewFragment.showSaveMovies = true;
-//                } else if(mListViewFragment != null) {
-//                    mListViewFragment.showSaveMovies = false;
-//                }
-
-                mSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            if(mListViewFragment != null) {
-                                mListViewFragment.setShowSavedMovies(true);
-                                mListViewFragment.loadSavedMovies();
-//                                mListViewFragment.setData();
-                            }
-                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
-                        } else {
-                            if(mListViewFragment != null) {
-                                mListViewFragment.setShowSavedMovies(false);
-                                mListViewFragment.reloadData();
-                            }
-//                            mListViewFragment.setData();
-                        }
-                    }
-                });
-            }
-        }
-
-//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+        initActionBar(actionBar);
 
         // we're being restored from a previous state
         if (savedInstanceState != null) {
@@ -201,12 +160,35 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onDestroy method");
     }
 
+    private void initActionBar(Toolbar actionBar) {
+        if (actionBar != null) {
+            mSwitcher = (Switch) (actionBar.findViewById(R.id.switcher));
+            if(mSwitcher != null) {
+                mSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            if(mListViewFragment != null) {
+                                mListViewFragment.setShowSavedMovies(true);
+                                mListViewFragment.loadSavedMovies();
+                            }
+                            getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
+                        } else {
+                            if(mListViewFragment != null) {
+                                mListViewFragment.setShowSavedMovies(false);
+                                mListViewFragment.reloadData();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     public void onMovieClick(int item) {
         if(item < 0) {
             return;
         }
-
-//        getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
 
         Intent intent = new Intent(this, DetailViewFragment.class);
         Bundle bundle = new Bundle();
@@ -264,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void updatingFinished() {
         updateFinishedNotification();
-//          getSupportLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getApplicationContext())).forceLoad();
     }
 
     public void changeTheme(View view) {
@@ -378,19 +359,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             } else {
-                int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
-                ArrayList<Movie> movies = intent.getParcelableArrayListExtra(MOVIES);
+                Bundle args = intent.getBundleExtra("BUNDLE");
+                ArrayList<Object> object = (ArrayList<Object>) args.getSerializable(MOVIES);
                 HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
-                ArrayList<Object> items = new ArrayList<Object>();
-
-                if(movieType == Model.NEW_MOVIE_TYPE) {
-                    Model.getInstance().setNewMovies(movies);
-                } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
-                    Model.getInstance().setPopularMovies(movies);
-                    if(mContext != null) {
-                        mContext.get().downloadingFinishedNotification();
-                    }
+                if(mContext != null) {
+                    mContext.get().downloadingFinishedNotification();
                 }
+                Model.getInstance().setMovies(object);
                 Model.getInstance().setPicture(pictures);
                 Model.getInstance().reloadData();
             }
