@@ -3,6 +3,7 @@ package cz.muni.fi.pv256.movio2.uco_396537.Download;
 import android.app.IntentService;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
@@ -10,6 +11,7 @@ import com.bumptech.glide.Glide;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
@@ -58,15 +60,9 @@ public class DownloadClient extends IntentService {
 
         ArrayList<Movie> movies = new ArrayList<>();
         HashMap<String, Bitmap> pictures = new HashMap<>();
-        int movieType = intent.getIntExtra(Model.MOVIE_TYPE, 0);
         DownloadInterface downloadService = mRetrofit.create(DownloadInterface.class);
         Call<MovieListJson> moviesCall = null;
-
-        if(movieType == Model.NEW_MOVIE_TYPE) {
-            moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
-        } else if(movieType == Model.POPULAR_MOVIE_TYPE) {
-            moviesCall = downloadService.downloadPopularMovies(API_KEY, POPULAR_MOVIES_URL);
-        }
+        moviesCall = downloadService.downloadNewMovies(API_KEY, NEW_MOVIES_URL);
 
         try {
             Response<MovieListJson> moviesResponse = moviesCall.execute();
@@ -98,7 +94,44 @@ public class DownloadClient extends IntentService {
             e.printStackTrace();
         }
 
-        if(movies.isEmpty()) {
+
+        ArrayList<Movie> movies1 = new ArrayList<>();
+        DownloadInterface downloadService1 = mRetrofit.create(DownloadInterface.class);
+        Call<MovieListJson> moviesCall1 = null;
+        moviesCall1 = downloadService1.downloadPopularMovies(API_KEY, POPULAR_MOVIES_URL);
+
+        try {
+            Response<MovieListJson> moviesResponse1 = moviesCall1.execute();
+            movies1 = moviesResponse1.body().results;
+
+            if(movies1 != null) {
+                if (!movies1.isEmpty()) {
+                    for (Movie movie1 : movies1) {
+                        if(movie1.getBackdrop() != null) {
+                            pictures.put(movie1.getBackdrop(), Glide.with(this).load(IMAGE_URL + IMAGE_HIGH_RESOLUTION    + movie1.getBackdrop()).asBitmap().into(200, 200).get());
+                        }
+                        if(movie1.getCover() != null) {
+                            pictures.put(movie1.getCover(), Glide.with(this).load(IMAGE_URL + IMAGE_LOW_RESOLUTION + movie1.getCover()).asBitmap().into(200, 200).get());
+                        }
+                    }
+                }
+            }
+        }
+        catch(NullPointerException e) {
+            e.printStackTrace();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+        catch(ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        if(movies.isEmpty() && movies1.isEmpty()) {
             Intent brocastIntent = new Intent();
             brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
             brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -112,8 +145,15 @@ public class DownloadClient extends IntentService {
             brocastIntent.setAction(MainActivity.DataReceiver.LOCAL_DOWNLOAD);
             brocastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
-            brocastIntent.putExtra(Model.MOVIE_TYPE, movieType);
-            brocastIntent.putExtra(MainActivity.DataReceiver.MOVIES, movies);
+            ArrayList<Object> all = new ArrayList<>();
+            all.add(new String("NEW MOVIES"));
+            all.addAll(movies);
+            all.add(new String("POPULAR MOVIES"));
+            all.addAll(movies1);
+
+            Bundle args = new Bundle();
+            args.putSerializable(MainActivity.DataReceiver.MOVIES, all);
+            brocastIntent.putExtra("BUNDLE",args);
             brocastIntent.putExtra(MainActivity.DataReceiver.PICTURES, pictures);
 
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
