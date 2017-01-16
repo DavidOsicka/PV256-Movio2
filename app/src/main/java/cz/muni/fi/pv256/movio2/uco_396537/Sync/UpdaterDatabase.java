@@ -102,10 +102,9 @@ public class UpdaterDatabase {
                                 public void run() { Toast.makeText(context, "Movies are actual", Toast.LENGTH_SHORT).show();}
                             }
                     );
-                } else {
-                    if(mMainActivity != null) {
-                        mMainActivity.get().updatingFinished();
-                    }
+                }
+                if(mMainActivity != null) {
+                    mMainActivity.get().updatingFinished();
                 }
             }
         };

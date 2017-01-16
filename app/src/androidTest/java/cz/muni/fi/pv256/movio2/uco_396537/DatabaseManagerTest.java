@@ -2,11 +2,13 @@ package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.test.AndroidTestCase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.muni.fi.pv256.movio2.uco_396537.Database.DatabaseContract;
 import cz.muni.fi.pv256.movio2.uco_396537.Database.DatabaseManager;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
+
 
 /**
  * Created by david on 8.1.17.
@@ -15,21 +17,22 @@ import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 public class DatabaseManagerTest extends AndroidTestCase {
 
     private DatabaseManager mManager;
+    private ArrayList<Movie> databaseBackup = new ArrayList<>();
 
     @Override
     protected void setUp() throws Exception {
         mManager = new DatabaseManager(mContext);
+        databaseBackup = mManager.getAllMovies();
+        mContext.getContentResolver().delete(DatabaseContract.MovieEntry.CONTENT_URI,null,null);
     }
 
     @Override
     public void tearDown() throws Exception {
-        mContext.getContentResolver().delete(
-                DatabaseContract.MovieEntry.CONTENT_URI,
-                null,
-                null
-        );
+        mContext.getContentResolver().delete(DatabaseContract.MovieEntry.CONTENT_URI,null,null);
+        for(Movie movie : databaseBackup) {
+            mManager.createMovie(movie);
+        }
     }
-
 
     public void testCreateMovie() throws Exception {
         Movie movie = new Movie(1, "my Movie", "14-1-1991", "cover", "backdrop", 1.5f, "overview");
