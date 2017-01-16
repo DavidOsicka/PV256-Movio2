@@ -31,21 +31,25 @@
                 android:layout_height="wrap_content"
                 android:switchPadding="10dp"
                 android:checked="false"
-                android:textColor="@android:color/white"
                 android:splitTrack="false"
                 android:textOn="Yes"
                 android:textOff="No"
+                android:textColor="@android:color/white"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true" />
 
             <Button
-                android:text="reload data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/button_reload"
                 android:onClick="updateSavedMovies"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"/>
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:text="Reload"
+                android:background="@android:color/transparent"
+                android:textColor="@android:color/white"
+                android:drawableLeft="@android:drawable/stat_notify_sync_noanim"
+                android:textAllCaps="false" />
 
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>

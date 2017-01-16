@@ -64,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onCreate method");
 
         // This is used to reload theme from preferences when swithing themes
-        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
-        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
-            setTheme(R.style.AppTheme1);
-        } else {
+//        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
+//        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
+//            setTheme(R.style.AppTheme1);
+//        } else {
             setTheme(R.style.AppTheme2);
-        }
+//        }
 
         isTablet = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
