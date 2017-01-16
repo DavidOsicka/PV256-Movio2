@@ -16,10 +16,8 @@ import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
 public class Model {
 
     public static final String MOVIE_TYPE = "Movie type";
-    public static final int NEW_MOVIE_TYPE = 1, POPULAR_MOVIE_TYPE = 2;
 
-    private ArrayList<Object> mNewMovies = new ArrayList<Object>();
-    private ArrayList<Object> mPopularMovies = new ArrayList<Object>();
+    private ArrayList<Object> mMovies = new ArrayList<>();
     private HashMap<String, Bitmap> mPictures = new HashMap<>();
     private static Model sInstance = null;
     private WeakReference<ListViewFragment> mContext = null;
@@ -38,23 +36,13 @@ public class Model {
         mContext = new WeakReference<>(listViewFragment);
     }
 
-    public void setNewMovies(ArrayList<Movie> movies) {
-        mNewMovies.clear();
-        mNewMovies.add(new String("NEW MOVIES"));
-        mNewMovies.addAll(movies);
-    }
-
-    public void setPopularMovies(ArrayList<Movie> movies) {
-        mPopularMovies.clear();
-        mPopularMovies.add(new String("POPULAR MOVIES"));
-        mPopularMovies.addAll(movies);
+    public void setMovies(ArrayList<Object> movies) {
+        mMovies.clear();
+        mMovies.addAll(movies);
     }
 
     public ArrayList<Object> getMovies() {
-        ArrayList<Object> items = new ArrayList<Object>();
-        items.addAll(mNewMovies);
-        items.addAll(mPopularMovies);
-        return items;
+        return mMovies;
     }
 
     public void setPicture(HashMap<String, Bitmap> pictures) {

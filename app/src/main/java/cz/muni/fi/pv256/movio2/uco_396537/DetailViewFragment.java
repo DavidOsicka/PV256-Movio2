@@ -67,7 +67,7 @@ public class DetailViewFragment extends Fragment {
         super.onAttach(context);
         Log.d(TAG, " onAttach method");
         sInstance = DetailViewFragment.this;
-        mDatabaseManager = new DatabaseManager(getActivity().getApplicationContext());
+        mDatabaseManager = new DatabaseManager(getActivity());
     }
 
     @Override
