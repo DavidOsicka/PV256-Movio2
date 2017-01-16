@@ -142,7 +142,6 @@ public class DatabaseManager {
         Movie movie = new Movie();
         movie.setId(cursor.getLong(COLUMN_MOVIE_ID));
         movie.setTitle(cursor.getString(COLUMN_TITLE));
-//        movie.setReleaseDate(cursor.getLong(COLUMN_RELEASE_DATE));
         movie.setReleaseDate(cursor.getString(COLUMN_RELEASE_DATE));
         movie.setCover(cursor.getString(COLUMN_COVER_PATH));
         movie.setBackdrop(cursor.getString(COLUMN_BACKDROP_PATH));
