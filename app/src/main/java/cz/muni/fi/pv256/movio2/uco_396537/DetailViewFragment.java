@@ -45,7 +45,7 @@ public class DetailViewFragment extends Fragment {
     private static DetailViewFragment sInstance = null;
     private Movie mMovie = null;
     private DatabaseManager mDatabaseManager = null;
-//    public WeakReference<ListViewFragment> mWeakRef = null;
+//    private WeakReference<MainActivity> mMainActivity = null;
 
 
     public static DetailViewFragment newInstance(Bundle args){
@@ -58,8 +58,8 @@ public class DetailViewFragment extends Fragment {
         return sInstance;
     }
 
-//    public void setContext(ListViewFragment listViewFragment) {
-//        mWeakRef = new WeakReference<>(listViewFragment);
+//    public void setContext(MainActivity mainActivity) {
+//        mMainActivity = new WeakReference<>(mainActivity);
 //    }
 
     @Override
@@ -67,7 +67,7 @@ public class DetailViewFragment extends Fragment {
         super.onAttach(context);
         Log.d(TAG, " onAttach method");
         sInstance = DetailViewFragment.this;
-        mDatabaseManager = new DatabaseManager(getActivity().getApplicationContext());
+        mDatabaseManager = new DatabaseManager(getActivity());
     }
 
     @Override
@@ -75,10 +75,6 @@ public class DetailViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d(TAG, " onCreate method");
         sInstance = DetailViewFragment.this;
-
-        if(savedInstanceState != null) {
-            mMovie = savedInstanceState.getParcelable(ARG_MOVIE);
-        }
     }
 
     @Override
@@ -95,21 +91,21 @@ public class DetailViewFragment extends Fragment {
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
         if(mMovie != null) {
-            if(titleView != null) {
+            if (titleView != null) {
                 titleView.setText(mMovie.getTitle() + System.lineSeparator() + mMovie.getReleaseDate()); //+ System.lineSeparator() + String.valueOf(calendar.get(Calendar.YEAR));
             }
-            if(descriptionView != null) {
+            if (descriptionView != null) {
                 descriptionView.setText(mMovie.getOverview());
             }
-            if(coverView != null) {
+            if (coverView != null) {
                 coverView.setImageBitmap(Model.getInstance().getPicture(mMovie.getCover()));
             } else {
-                coverView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
+                coverView.setImageBitmap(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
             }
-            if(backdropView != null) {
+            if (backdropView != null) {
                 backdropView.setImageBitmap(Model.getInstance().getPicture(mMovie.getBackdrop()));
             } else {
-                backdropView.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
+                backdropView.setImageBitmap(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
             }
             if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
                 fab.setImageResource(android.R.drawable.ic_input_add);
@@ -126,13 +122,10 @@ public class DetailViewFragment extends Fragment {
 
                     if (mDatabaseManager.getMovieById(mMovie.getId()).size() == 0) {
                         getLoaderManager().initLoader(LOADER_CREATE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
-//                    runLoader(LOADER_CREATE_MOVIE);
                     } else {
                         getLoaderManager().initLoader(LOADER_DELETE_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
-//                    runLoader(LOADER_DELETE_MOVIE);
                     }
-//                getLoaderManager().initLoader(LOADER_FIND_MOVIE, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
-//                getLoaderManager().initLoader(LOADER_FIND_ALL, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+                    getLoaderManager().initLoader(LOADER_FIND_ALL, args, new MovieCallback(getActivity().getApplicationContext())).forceLoad();
                 }
             });
         }
@@ -259,12 +252,9 @@ public class DetailViewFragment extends Fragment {
                     break;
                 case LOADER_FIND_ALL:
                     Log.i(TAG, " LOADER_FIND_ALL " + data.size());
-//                    if(mWeakRef != null) {
-//                        if(mWeakRef.get() != null) {
-//                            ArrayList<Object> myData = new ArrayList<>();
-//                            myData.addAll(data);
-//                            mWeakRef.get().setData(myData);
-//                        }
+//                    if(mMainActivity != null) {
+//                        mMainActivity.get().mSavedMovies.clear();
+//                        mMainActivity.get().mSavedMovies.addAll(data);
 //                    }
                     break;
                 default:

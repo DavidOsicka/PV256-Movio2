@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Movio2</string>
+    <string name="sync_account_type">cz.muni.fi.pv256.movio2</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio2.uco_396537</string>
 </resources>

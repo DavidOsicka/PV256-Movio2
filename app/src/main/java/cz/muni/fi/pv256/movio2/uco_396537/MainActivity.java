@@ -35,6 +35,8 @@ import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Download.DownloadClient;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
+import cz.muni.fi.pv256.movio2.uco_396537.Sync.UpdaterDatabase;
+import cz.muni.fi.pv256.movio2.uco_396537.Sync.UpdaterSyncAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -62,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, " onCreate method");
 
         // This is used to reload theme from preferences when swithing themes
-        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
-        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
-            setTheme(R.style.AppTheme1);
-        } else {
+//        SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
+//        if(pref.getString(THEME_NAME, "").equals("AppTheme1")){
+//            setTheme(R.style.AppTheme1);
+//        } else {
             setTheme(R.style.AppTheme2);
-        }
+//        }
 
         isTablet = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE ||
                 (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;
@@ -89,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
         Intent newMovieDownloadIntent = new Intent(this, DownloadClient.class);
         startService(newMovieDownloadIntent);
+
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
+        UpdaterDatabase.getInstance().setMainActivityContext(this);
 
         Toolbar actionBar = (Toolbar) findViewById(R.id.my_action_bar);
         setSupportActionBar(actionBar);
@@ -233,6 +238,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateSavedMovies(View view) {
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
+        UpdaterSyncAdapter.syncImmediately(MainActivity.this);
+        updatingNotification();
+    }
+
+    public void updatingFinished() {
+        updateFinishedNotification();
+    }
+
     public void changeTheme(View view) {
         SharedPreferences pref = getSharedPreferences(PREFERENCES_NAME,MODE_PRIVATE);
         SharedPreferences.Editor editor = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE).edit();
@@ -248,7 +263,33 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void downloadingNotification() {
+    private void updatingNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
+                    .setSmallIcon(android.R.drawable.ic_popup_sync)
+                    .setContentTitle("Movio2 is updating")
+                    .setContentText("Saved movies are being updated")
+                    .setAutoCancel(true);
+
+        mNotificationManager.notify(0, updateNotification.build());
+    }
+
+    private void updateFinishedNotification() {
+        if(mNotificationManager == null) {
+            return;
+        }
+        NotificationCompat.Builder updateNotification = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_notify_sync)
+                .setContentTitle("Movio2 finished updating")
+                .setContentText("Saved movies were updated")
+                .setAutoCancel(true);
+
+        mNotificationManager.notify(0, updateNotification.build());
+    }
+
+    private void downloadingNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -266,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void finishedNotification() {
+    private void downloadingFinishedNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -283,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void errorNotification() {
+    private void errorNotification() {
         if(mNotificationManager == null) {
             return;
         }
@@ -321,9 +362,8 @@ public class MainActivity extends AppCompatActivity {
                 Bundle args = intent.getBundleExtra("BUNDLE");
                 ArrayList<Object> object = (ArrayList<Object>) args.getSerializable(MOVIES);
                 HashMap<String, Bitmap> pictures = (HashMap<String, Bitmap>)intent.getSerializableExtra(PICTURES);
-
                 if(mContext != null) {
-                    mContext.get().finishedNotification();
+                    mContext.get().downloadingFinishedNotification();
                 }
                 Model.getInstance().setMovies(object);
                 Model.getInstance().setPicture(pictures);
