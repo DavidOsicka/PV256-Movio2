@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class DataReceiver extends BroadcastReceiver {
 
-        public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.Model.intent.action.LOCAL_DOWNLOAD";
+        public static final String LOCAL_DOWNLOAD = "cz.muni.fi.pv256.movio2.uco_396537.LOCAL_DOWNLOAD";
         public static final String MOVIES = "movies";
         public static final String PICTURES = "pictures";
         public static final String ERROR = "error";

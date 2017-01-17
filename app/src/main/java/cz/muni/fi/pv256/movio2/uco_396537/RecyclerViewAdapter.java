@@ -125,7 +125,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mMovieTitle = (TextView) view.findViewById(R.id.movie_title);
             mMovieImage = (ImageView) view.findViewById(R.id.movie_image);
             mMovieRating = (TextView) view.findViewById(R.id.movie_rating);
-            mLayout = (RelativeLayout) view.findViewById(R.id.layout);
+            mLayout = (RelativeLayout) view.findViewById(R.id.movie_view);
 
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
