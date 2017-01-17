@@ -1,11 +1,10 @@
 package cz.muni.fi.pv256.movio2.uco_396537.Models;
 
-
 import android.graphics.Bitmap;
-import android.util.ArrayMap;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
 
@@ -16,17 +15,15 @@ import cz.muni.fi.pv256.movio2.uco_396537.ListViewFragment;
 
 public class Model {
 
-    private ArrayList<Object> mItems = new ArrayList<Object>();
-    private ArrayMap<String, Bitmap> mPictures = new ArrayMap<>();
+    public static final String MOVIE_TYPE = "Movie type";
 
+    private ArrayList<Object> mMovies = new ArrayList<>();
+    private HashMap<String, Bitmap> mPictures = new HashMap<>();
     private static Model sInstance = null;
-    private boolean mDownloaded = false;
     private WeakReference<ListViewFragment> mContext = null;
 
 
-
-
-    private Model() {}
+    private Model() { }
 
     public static Model getInstance() {
         if(sInstance == null) {
@@ -37,35 +34,33 @@ public class Model {
 
     public void setContext(ListViewFragment listViewFragment) {
         mContext = new WeakReference<>(listViewFragment);
-        DownloadClient.getsInstance().setContext(listViewFragment);
-        if(!mDownloaded) {
-            DownloadClient.getsInstance().execute();
-            mDownloaded = true;
-        }
     }
 
-    public  void setMovies(ArrayList<Object> movies) {
-        mItems = movies;
-        if(mContext != null) {
-            mContext.get().reloadData();
-        }
+    public void setMovies(ArrayList<Object> movies) {
+        mMovies.clear();
+        mMovies.addAll(movies);
     }
 
     public ArrayList<Object> getMovies() {
-        return mItems;
+        return mMovies;
     }
 
-    public void setPicture(String key, Bitmap picture) {
-        mPictures.put(key, picture);
-        if(mContext != null) {
-            //mContext.get().reloadData();
-        }
+    public void setPicture(HashMap<String, Bitmap> pictures) {
+        mPictures.putAll(pictures);
     }
 
     public Bitmap getPicture(String key) {
         if(mPictures.containsKey(key)) {
             return mPictures.get(key);
         }
-        return Bitmap.createBitmap(0,0, Bitmap.Config.RGB_565);
+        return Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
+    }
+
+    public void reloadData() {
+        if(mContext != null) {
+            if(mContext.get() != null) {
+                mContext.get().reloadData();
+            }
+        }
     }
 }

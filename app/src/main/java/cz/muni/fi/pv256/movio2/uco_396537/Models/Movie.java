@@ -11,31 +11,41 @@ import com.google.gson.annotations.SerializedName;
 
 public class Movie implements Parcelable {
 
+    private long id;
     private String title;
-    private long releaseDate;
+    @SerializedName("release_date")
+//    private long releaseDate;
+    private String releaseDate;
     @SerializedName("poster_path")
-    private String coverPath;
+    private String cover;
     @SerializedName("backdrop_path")
     private String backdrop;
+    //@SerializedName("vote_average") // nevim jestli má zobrazovat popularity nebo vore avarege, každý jiný čísla
     private float popularity;
-
+    private String overview;
 
     public Movie() { }
 
     public Movie(Parcel parcel) {
+        id = parcel.readLong();
         title = parcel.readString();
-        releaseDate = parcel.readLong();
-        coverPath = parcel.readString();
+//        releaseDate = parcel.readLong();
+        releaseDate = parcel.readString();
+        cover = parcel.readString();
         backdrop = parcel.readString();
         popularity = parcel.readFloat();
+        overview = parcel.readString();
     }
 
-    public Movie(String title, long releaseDate, String coverPath, String backdrop, float popularity) {
+    public Movie(long id, String title, String releaseDate, String cover, String backdrop, float popularity, String overview) {
+        this.id = id;
         this.title = title;
+//        this.releaseDate = releaseDate;
         this.releaseDate = releaseDate;
-        this.coverPath = coverPath;
+        this.cover = cover;
         this.backdrop = backdrop;
         this.popularity = popularity;
+        this.overview = overview;
     }
 
     @Override
@@ -45,18 +55,20 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
         parcel.writeString(title);
-        parcel.writeLong(releaseDate);
-        parcel.writeString(coverPath);
+//        parcel.writeLong(releaseDate);
+        parcel.writeString(releaseDate);
+        parcel.writeString(cover);
         parcel.writeString(backdrop);
         parcel.writeFloat(popularity);
+        parcel.writeString(overview);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         public Movie createFromParcel(Parcel in) {
             return new Movie(in);
         }
-
         public Movie[] newArray(int size) {
             return new Movie[size];
         }
@@ -67,14 +79,21 @@ public class Movie implements Parcelable {
         final int prime = 31;
         int result = 1;
 
+        result = prime * result + (int)id;
         result = prime * result + (title == null ? 0 : title.hashCode());
-        result = prime * result + (int)releaseDate;
-        result = prime * result + (coverPath == null ? 0 : coverPath.hashCode());
+//        result = prime * result + (int)releaseDate;
+        result = prime * result + (title == null ? 0 : title.hashCode());
+        result = prime * result + (releaseDate == null ? 0 : releaseDate.hashCode());
+        result = prime * result + (cover == null ? 0 : cover.hashCode());
         result = prime * result + (backdrop == null ? 0 : backdrop.hashCode());
         result = prime * result + (int)popularity;
+        result = prime * result + (overview == null ? 0 : overview.hashCode());
 
         return result;
     }
+
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
     public String getTitle() {
         return title;
@@ -83,18 +102,19 @@ public class Movie implements Parcelable {
         this.title = title;
     }
 
-    public long getReleaseDate() {
-        return releaseDate;
-    }
-    public void setReleaseDate(long releaseDate) {
+//    public long getReleaseDate() { return releaseDate; }
+//    public void setReleaseDate(long releaseDate) { this.releaseDate = releaseDate; }
+
+    public String getReleaseDate() { return releaseDate; }
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public String getCoverPath() {
-        return coverPath;
+    public String getCover() {
+        return cover;
     }
-    public void setCoverPath(String coverPath) {
-        this.coverPath = coverPath;
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getBackdrop() {
@@ -111,4 +131,6 @@ public class Movie implements Parcelable {
         this.popularity = popularity;
     }
 
+    public String getOverview() { return overview; }
+    public void setOverview(String overview) { this.overview = overview; }
 }

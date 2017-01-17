@@ -3,14 +3,18 @@ package cz.muni.fi.pv256.movio2.uco_396537;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import java.util.ArrayList;
+import cz.muni.fi.pv256.movio2.uco_396537.Database.MovieFindAllLoader;
 import cz.muni.fi.pv256.movio2.uco_396537.Models.Model;
+import cz.muni.fi.pv256.movio2.uco_396537.Models.Movie;
 
 /**
  * Created by david on 10.10.16.
@@ -20,11 +24,16 @@ public class ListViewFragment extends Fragment {
 
     private static final String TAG = ListViewFragment.class.getName();
 
+    private static final int LOADER_FIND_ALL = 4;
+    private static final String ARG_SHOW_SAVED = "show_saved";
+
     private RecyclerView mRecyclerView = null;
     private RecyclerView.Adapter mAdapter = null;
     private RecyclerView.LayoutManager mLayoutManager = null;
-
     private Context mContext = null;
+    private ArrayList<Object> mSavedMovies = new ArrayList<>();
+    private boolean mDownloading = false;
+    private boolean mShowSavedMovies = false;
 
 
     @Override
@@ -38,6 +47,10 @@ public class ListViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, " onCreate  method");
+
+        if(savedInstanceState != null) {
+            mShowSavedMovies = savedInstanceState.getBoolean(ARG_SHOW_SAVED);
+        }
     }
 
     @Override
@@ -58,7 +71,14 @@ public class ListViewFragment extends Fragment {
         }
 
         Model.getInstance().setContext(this);
-        reloadData();
+        if(mShowSavedMovies) {
+                loadSavedMovies();
+//            setData();
+//            getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+        } else {
+            reloadData();
+//            setData(Model.getInstance().getMovies());
+        }
 
         return view;
     }
@@ -94,13 +114,93 @@ public class ListViewFragment extends Fragment {
         Log.d(TAG, " onDestroy method");
     }
 
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        outState.putBoolean(ARG_SHOW_SAVED, mShowSavedMovies);
+        super.onSaveInstanceState(outState);
+    }
+
+    public void loadSavedMovies() {
+        getLoaderManager().initLoader(LOADER_FIND_ALL, new Bundle(), new MovieCallback(getActivity().getApplicationContext())).forceLoad();
+    }
+
+    public void setDownloading(boolean downloading) {
+        mDownloading = downloading;
+        reloadData();
+    }
+
+    public void setShowSavedMovies(boolean showSavedMovies) {
+        mShowSavedMovies = showSavedMovies;
+        reloadData();
+    }
+
     public void reloadData() {
-        if(Model.getInstance().getMovies().isEmpty()) {
-            mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+        if(mRecyclerView == null) {
+            return;
+        }
+        if(mDownloading) {
+            mAdapter = new RecyclerViewAdapter("Downloading data");
             mRecyclerView.setAdapter(mAdapter);
+        } else if(mShowSavedMovies) {
+            if(mSavedMovies.isEmpty()) {
+                mAdapter = new RecyclerViewAdapter("No movies saved in database");
+                mRecyclerView.setAdapter(mAdapter);
+            } else {
+                mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
+                mRecyclerView.setAdapter(mAdapter);
+            }
         } else {
-            mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
-            mRecyclerView.setAdapter(mAdapter);
+            if(Model.getInstance().getMovies().isEmpty()) {
+                mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+                mRecyclerView.setAdapter(mAdapter);
+            } else {
+                mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        }
+    }
+
+
+    public class MovieCallback implements LoaderManager.LoaderCallbacks<ArrayList<Movie>> {
+        Context mContext;
+
+        public MovieCallback(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Loader<ArrayList<Movie>> onCreateLoader(int id, Bundle args) {
+            Log.i(TAG, " onCreateLoader method");
+            switch (id) {
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL");
+                    return new MovieFindAllLoader(mContext);
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
+            Log.i(TAG, " onLoadFinished method");
+            switch (loader.getId()) {
+                case LOADER_FIND_ALL:
+                    Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    mSavedMovies.clear();
+                    mSavedMovies.addAll(data);
+                    reloadData();
+//                    ArrayList<Object> myData = new ArrayList<>();
+//                    myData.addAll(data);
+//                    setData(myData);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not know loader id");
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ArrayList<Movie>> loader) {
+            Log.i(TAG, " onLoadReset method");
         }
     }
 }

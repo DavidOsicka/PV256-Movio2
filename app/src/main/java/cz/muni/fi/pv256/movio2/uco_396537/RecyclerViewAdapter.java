@@ -1,6 +1,7 @@
 package cz.muni.fi.pv256.movio2.uco_396537;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -58,7 +59,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return -1;
     }
 
-
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -67,7 +67,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LayoutInflater inflater =  LayoutInflater.from(parent.getContext());
         View view;
         switch(viewType) {
-            case  CATEGORY_VIEW :
+            case CATEGORY_VIEW :
                 view = inflater.inflate(R.layout.category_view, parent, false);
                 return new ViewHolder_category(view);
             case MOVIE_VIEW:
@@ -98,13 +98,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Movie movie = (Movie) mItems.get(position);
                 movieHolder.mMovieTitle.setText(movie.getTitle());
                 movieHolder.mMovieRating.setText(Float.toString(Math.round(movie.getPopularity())));
-                if(movie.getBackdrop() != null && mContext != null) {
+                if(movie.getBackdrop() != null) {
                     movieHolder.mMovieImage.setImageBitmap(Model.getInstance().getPicture(movie.getBackdrop()));
+                } else {
+                    movieHolder.mMovieImage.setImageBitmap(Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888));
                 }
                 break;
             case EMPTY_VIEW :
                 ViewHolder_empty emptyView = (ViewHolder_empty) holder;
-                emptyView.mEmptyListLabel.setText(mItems.get(position).toString() /*noDataLabel*/);
+                emptyView.mEmptyListLabel.setText(mItems.get(position).toString());
                 break;
         }
     }
