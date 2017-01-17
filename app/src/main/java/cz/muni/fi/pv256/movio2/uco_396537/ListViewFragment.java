@@ -39,14 +39,18 @@ public class ListViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG, " onAttach  method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onAttach  method");
+        }
         mContext = getActivity();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, " onCreate  method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onCreate  method");
+        }
 
         if(savedInstanceState != null) {
             mShowSavedMovies = savedInstanceState.getBoolean(ARG_SHOW_SAVED);
@@ -55,7 +59,9 @@ public class ListViewFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, " onCreateView method ");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onCreateView method ");
+        }
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.list_view_fragment, container, false);
@@ -87,31 +93,41 @@ public class ListViewFragment extends Fragment {
     public void onStart() {
         super.onStart();
         // The activity is about to become visible.
-        Log.d(TAG, " onStart method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onStart method");
+        }
     }
     @Override
     public void onResume() {
         super.onResume();
         // The activity has become visible (it is now "resumed").
-        Log.d(TAG, " onResume method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onResume method");
+        }
     }
     @Override
     public void onPause() {
         super.onPause();
         // Another activity is taking focus (this activity is about to be "paused").
-        Log.d(TAG, " onPause method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onPause method");
+        }
     }
     @Override
     public void onStop() {
         super.onStop();
         // The activity is no longer visible (it is now "stopped")
-        Log.d(TAG, " onStop method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onStop method");
+        }
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         // The activity is about to be destroyed.
-        Log.d(TAG, " onDestroy method");
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, " onDestroy method");
+        }
     }
 
     @Override
@@ -139,11 +155,11 @@ public class ListViewFragment extends Fragment {
             return;
         }
         if(mDownloading) {
-            mAdapter = new RecyclerViewAdapter("Downloading data");
+            mAdapter = new RecyclerViewAdapter(getResources().getString(R.string.recyclerView_downloading));
             mRecyclerView.setAdapter(mAdapter);
         } else if(mShowSavedMovies) {
             if(mSavedMovies.isEmpty()) {
-                mAdapter = new RecyclerViewAdapter("No movies saved in database");
+                mAdapter = new RecyclerViewAdapter(getResources().getString(R.string.recyclerView_no_movies));
                 mRecyclerView.setAdapter(mAdapter);
             } else {
                 mAdapter = new RecyclerViewAdapter(mSavedMovies, mContext);
@@ -151,7 +167,7 @@ public class ListViewFragment extends Fragment {
             }
         } else {
             if(Model.getInstance().getMovies().isEmpty()) {
-                mAdapter = new RecyclerViewAdapter("Sorry, no data available");
+                mAdapter = new RecyclerViewAdapter(getResources().getString(R.string.recyclerView_no_data));
                 mRecyclerView.setAdapter(mAdapter);
             } else {
                 mAdapter = new RecyclerViewAdapter(Model.getInstance().getMovies(), mContext);
@@ -170,10 +186,14 @@ public class ListViewFragment extends Fragment {
 
         @Override
         public Loader<ArrayList<Movie>> onCreateLoader(int id, Bundle args) {
-            Log.i(TAG, " onCreateLoader method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onCreateLoader method");
+            }
             switch (id) {
                 case LOADER_FIND_ALL:
-                    Log.i(TAG, " LOADER_FIND_ALL");
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, " LOADER_FIND_ALL");
+                    }
                     return new MovieFindAllLoader(mContext);
                 default:
                     throw new UnsupportedOperationException("Not know loader id");
@@ -182,16 +202,17 @@ public class ListViewFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<ArrayList<Movie>> loader, ArrayList<Movie> data) {
-            Log.i(TAG, " onLoadFinished method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onLoadFinished method");
+            }
             switch (loader.getId()) {
                 case LOADER_FIND_ALL:
-                    Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    if (BuildConfig.DEBUG) {
+                        Log.i(TAG, " LOADER_FIND_ALL " + data.size());
+                    }
                     mSavedMovies.clear();
                     mSavedMovies.addAll(data);
                     reloadData();
-//                    ArrayList<Object> myData = new ArrayList<>();
-//                    myData.addAll(data);
-//                    setData(myData);
                     break;
                 default:
                     throw new UnsupportedOperationException("Not know loader id");
@@ -200,7 +221,9 @@ public class ListViewFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<ArrayList<Movie>> loader) {
-            Log.i(TAG, " onLoadReset method");
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, " onLoadReset method");
+            }
         }
     }
 }

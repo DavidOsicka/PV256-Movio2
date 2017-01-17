@@ -1,3 +1,8 @@
+def VERSION_MAJOR = 1
+def VERSION_MINOR = 0
+def VERSION_PATCH = 0
+def VERSION_BUILD = 0
+
 apply plugin: 'com.android.application'
 
 android {
@@ -5,16 +10,43 @@ android {
     buildToolsVersion "23.0.2"
     defaultConfig {
         applicationId "cz.muni.fi.pv256.movio2.uco_396537"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        resConfigs "cz", "en", "ja"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("myreleasekey.keystore")
+            storePassword "password"
+            keyAlias "MyReleaseKey"
+            keyPassword "password"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    productFlavors {
+        flavor2 {   // release
+            buildConfigField "Boolean", "logging", "false"
+            versionName "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+        }
+        flavor1 {   // debug
+            buildConfigField "Boolean", "logging", "true"
+            versionName "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}-versionCode"
+            applicationId 'cz.muni.fi.pv256.movio2.uco_396537.debug'
         }
     }
 }

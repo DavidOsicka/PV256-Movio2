@@ -7,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.design.BuildConfig;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -45,7 +46,9 @@ public class DatabaseProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.d(TAG, Arrays.toString(selectionArgs));
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, Arrays.toString(selectionArgs));
+        }
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case MOVIE_ID: {
@@ -96,7 +99,9 @@ public class DatabaseProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        Log.d(TAG, values.toString());
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, values.toString());
+        }
 
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Movio2</string>
+    <string name="sync_account_type">cz.muni.fi.pv256.movio2</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio2.uco_396537</string>
+    <string name="api_key">32bde8b225e94c4cbc6cacbe47c99cf1</string>
+
+    <string name="updating_notif_title">Movio2 aktualizace dat</string>
+    <string name="updating_notif_text">Probíhá aktualizace uložených filmů</string>
+    <string name="updating_finished_notif_title">Movio2 aktualizace dat ukončena</string>
+    <string name="updating_finished_notif_text">Uložené filmy byly úspěšně aktualizovány</string>
+    <string name="downloading_notif_title">Probíhá stahování</string>
+    <string name="downloading_notif_text">Movio2 stahuje aktuální data</string>
+    <string name="downloading_finished_notif_title">Stahování ukončeno</string>
+    <string name="downloading_finished_notif_text">Movio2 stahování dat bylo úspěšně ukončeno</string>
+    <string name="error_notif_title">Chyba</string>
+    <string name="error_notif_text">Movio2 nemohlo stáhnout data</string>
+    <string name="recyclerView_downloading">Probíhá stahování</string>
+    <string name="recyclerView_no_movies">Žádné uložené filmy</string>
+    <string name="recyclerView_no_data">Data nejsou dostupná</string>
+    <string name="category_new_movies">NOVÉ FILMY</string>
+    <string name="category_popular_movies">OBLÍBENÉ FILMY</string>
+    <string name="switch_label">aktuální/uložené</string>
+    <string name="reload_button_label">aktualizovat</string>
+</resources>
